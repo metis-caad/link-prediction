@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
+    http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+  <graph id="3R7HaXKX1ExSSuS6Z6nRGd" edgedefault="undirected">
+  <key id="imageUri" for="graph" attr.name="imageUri" attr.type="string"/>
+  <key id="imageMD5" for="graph" attr.name="imageMD5" attr.type="string"/>
+  <key id="validatedManually" for="graph" attr.name="validatedManually" attr.type="boolean"/>
+  <key id="floorLevel" for="graph" attr.name="floorLevel" attr.type="float"/>
+  <key id="buildingId" for="graph" attr.name="buildingId" attr.type="string"/>
+  <key id="ifcUri" for="graph" attr.name="ifcUri" attr.type="string"/>
+  <key id="bimServerPoid" for="graph" attr.name="bimserverPoid" attr.type="long"/>
+  <key id="alignmentNorth" for="graph" attr.name="alignmentNorth" attr.type="float"/>
+  <key id="geoReference" for="graph" attr.name="geoReference" attr.type="string"/>
+  <key id="name" for="node" attr.name="name" attr.type="string"/>
+  <key id="roomType" for="node" attr.name="roomType" attr.type="string"/>
+  <key id="center" for="node" attr.name="center" attr.type="string"/>
+  <key id="corners" for="node" attr.name="corners" attr.type="string"/>
+  <key id="windowExist" for="node" attr.name="windowExist" attr.type="boolean"/>
+  <key id="enclosedRoom" for="node" attr.name="enclosedRoom" attr.type="boolean"/>
+  <key id="area" for="node" attr.name="area" attr.type="float"/>
+  <key id="edgeType" for="edge" attr.name="edgeType" attr.type="string"/>
+
+  <data key="imageUri">http://mediatum.ub.tum.de/file/1231217/962822.svg</data>
+  <data key="imageMD5">302125A7720F9B43885C8752690BAF0B</data>
+  <data key="validatedManually">true</data>
+  <data key="floorLevel">0.0</data>
+  <data key="buildingId">3foonFrPxJ0Z59Ncoz9MkQ</data>
+  <data key="ifcUri">http://data.ksd.ai.ar.tum.de:8080</data>
+  <data key="bimServerPoid">0</data>
+  <data key="alignmentNorth">0.0</data>
+  <data key="geoReference">null</data>
+  <node id="0z8H1b397fI8zZP$EK9cro">
+    <data key="name">Wohnen</data>
+    <data key="roomType">LIVING</data>
+    <data key="center">POINT (5.11 -2.13)</data>
+    <data key="corners">POLYGON ((1.48 -3.8850000000000002, 5.055 -3.8850000000000002, 6.865 -9.795, 6.865 -3.67, 9.83 -3.670000244140625, 9.83 -0.375, 0.27 -0.375, 0.27 -9.795, 5.055 -6.745, 1.48 -6.745, 1.48 -3.8850000000000002))</data>
+    <data key="windowExist">true</data>
+    <data key="enclosedRoom">true</data>
+    <data key="area">49.024403</data>
+  </node>
+  <node id="3E9qzTvxyLGuhnbiyOYRwC">
+    <data key="name">Treppenhaus</data>
+    <data key="roomType">CORRIDOR</data>
+    <data key="center">POINT (8.435 -5.2399999633431085)</data>
+    <data key="corners">POLYGON ((9.83 -3.845, 7.04 -3.844999926686214, 7.04 -9.795, 9.83 -9.795, 9.83 -3.845))</data>
+    <data key="windowExist">true</data>
+    <data key="enclosedRoom">true</data>
+    <data key="area">16.6005</data>
+  </node>
+  <node id="0ulCbnC0sSHAeIjhNS2C1F">
+    <data key="name">Bad</data>
+    <data key="roomType">BATH</data>
+    <data key="center">POINT (2.570000030517578 -5.804999969482422)</data>
+    <data key="corners">POLYGON ((3.3950000610351565 -5.1000000000000005, 3.3950000610351565 -4.2, 1.745 -4.2, 1.745 -6.63, 3.825 -6.63, 3.825 -5.98, 3.94 -5.98, 3.94 -6.63, 4.94 -6.63, 4.94 -4.2, 3.5100000610351563 -4.2, 3.5100000610351563 -5.1000000000000005, 3.3950000610351565 -5.1000000000000005))</data>
+    <data key="windowExist">false</data>
+    <data key="enclosedRoom">true</data>
+    <data key="area">7.5856</data>
+  </node>
+  <edge id="3c30084c-d107-40fe-bcd5-93db1e6a1278" source="3E9qzTvxyLGuhnbiyOYRwC" target="0z8H1b397fI8zZP$EK9cro">
+    <data key="edgeType">DOOR</data>
+  </edge>
+  <edge id="9f90bf50-7dc6-46b5-975a-7ce8421b9423" source="0ulCbnC0sSHAeIjhNS2C1F" target="0z8H1b397fI8zZP$EK9cro">
+    <data key="edgeType">DOOR</data>
+  </edge>
+  </graph>
+</graphml>

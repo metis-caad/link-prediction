@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
+    http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+  <graph id="1IEeEPbCv1je0WG2w2fWDZ" edgedefault="undirected">
+  <key id="imageUri" for="graph" attr.name="imageUri" attr.type="string"/>
+  <key id="imageMD5" for="graph" attr.name="imageMD5" attr.type="string"/>
+  <key id="validatedManually" for="graph" attr.name="validatedManually" attr.type="boolean"/>
+  <key id="floorLevel" for="graph" attr.name="floorLevel" attr.type="float"/>
+  <key id="buildingId" for="graph" attr.name="buildingId" attr.type="string"/>
+  <key id="ifcUri" for="graph" attr.name="ifcUri" attr.type="string"/>
+  <key id="bimServerPoid" for="graph" attr.name="bimserverPoid" attr.type="long"/>
+  <key id="alignmentNorth" for="graph" attr.name="alignmentNorth" attr.type="float"/>
+  <key id="geoReference" for="graph" attr.name="geoReference" attr.type="string"/>
+  <key id="name" for="node" attr.name="name" attr.type="string"/>
+  <key id="roomType" for="node" attr.name="roomType" attr.type="string"/>
+  <key id="center" for="node" attr.name="center" attr.type="string"/>
+  <key id="corners" for="node" attr.name="corners" attr.type="string"/>
+  <key id="windowExist" for="node" attr.name="windowExist" attr.type="boolean"/>
+  <key id="enclosedRoom" for="node" attr.name="enclosedRoom" attr.type="boolean"/>
+  <key id="area" for="node" attr.name="area" attr.type="float"/>
+  <key id="edgeType" for="edge" attr.name="edgeType" attr.type="string"/>
+
+  <data key="imageUri">http://mediatum.ub.tum.de/file/1230174/1709.svg</data>
+  <data key="imageMD5">66B44740DAA71957C711C99A562F7308</data>
+  <data key="validatedManually">false</data>
+  <data key="floorLevel">0.0</data>
+  <data key="buildingId">1IEeEPbCv1je0WG2vzMPyH</data>
+  <data key="ifcUri">http://data.ksd.ai.ar.tum.de:8080</data>
+  <data key="bimServerPoid">0</data>
+  <data key="alignmentNorth">0.0</data>
+  <data key="geoReference">null</data>
+  <node id="0O2qvCotj5hwYFVhQ$OZzJ">
+    <data key="name">Bad</data>
+    <data key="roomType">BATH</data>
+    <data key="center">POINT (-1.082136183977127 -4.6282724142074585)</data>
+    <data key="corners">POLYGON ((0.48161381483078003 -3.3777949810028076, -2.645886182785034 -3.3777949810028076, -2.645886182785034 -5.878749847412109, 0.48161381483078003 -5.878749847412109, 0.48161381483078003 -3.3777949810028076))</data>
+    <data key="windowExist">false</data>
+    <data key="enclosedRoom">true</data>
+    <data key="area">7.8217363</data>
+  </node>
+  <node id="0O2qvCotj5hwYFVhQ$OZvL">
+    <data key="name">Schlafen</data>
+    <data key="roomType">SLEEPING</data>
+    <data key="center">POINT (2.1591137647628784 -3.5662497282028203)</data>
+    <data key="corners">POLYGON ((0.5816137790679932 -1.2537496089935303, 0.5816137790679932 -5.878749847412109, 3.7366137504577637 -5.878749847412109, 3.7366137504577637 -1.2537496089935303, 0.5816137790679932 -1.2537496089935303))</data>
+    <data key="windowExist">true</data>
+    <data key="enclosedRoom">true</data>
+    <data key="area">14.591876</data>
+  </node>
+  <node id="0O2qvCotj5hwYFVhQ$OZzM">
+    <data key="name">Treppenhaus</data>
+    <data key="roomType">CORRIDOR</data>
+    <data key="center">POINT (-4.369636178016663 -1.6324995756149288)</data>
+    <data key="corners">POLYGON ((-4.080886363983154 -4.878749847412109, -2.915886163711548 -4.878749847412109, -2.915886163711548 -3.3277950286865234, -2.915886163711548 -0.9903950095176697, -2.915886163711548 3.339986562728882, -4.015886306762695 3.339986562728882, -5.823386192321777 3.339986562728882, -5.823386192321777 -3.086249589920044, -5.577016830444336 -3.086249589920044, -5.577016830444336 -3.2862496376037598, -5.823386192321777 -3.2862496376037598, -5.823386192321777 -4.878749847412109, -4.280886173248291 -4.878749847412109, -4.280886173248291 -3.2862496376037598, -4.377017021179199 -3.2862496376037598, -4.377017021179199 -3.086249589920044, -4.080886363983154 -3.086249589920044, -4.080886363983154 -4.878749847412109))</data>
+    <data key="windowExist">true</data>
+    <data key="enclosedRoom">true</data>
+    <data key="area">23.468977</data>
+  </node>
+  <node id="0O2qvCotj5hwYFVhQ$OY4r">
+    <data key="name">KÃƒÂ¼che</data>
+    <data key="roomType">KITCHEN</data>
+    <data key="center">POINT (-1.0571361780166628 0.4359878301620482)</data>
+    <data key="corners">POLYGON ((-2.645886182785034 -1.1527621746063232, -1.08564293384552 -1.1527621746063232, -1.08564293384552 -1.2027621269226074, 0.3786042034626007 -1.2027621269226074, 0.531613826751709 -1.2027621269226074, 0.531613826751709 3.339986562728882, -2.645886182785034 3.339986562728882, -2.645886182785034 -1.1527621746063232))</data>
+    <data key="windowExist">false</data>
+    <data key="enclosedRoom">false</data>
+    <data key="area">14.356572</data>
+  </node>
+  <node id="0O2qvCotj5hwYFVhQ$OY4s">
+    <data key="name">Wohnen</data>
+    <data key="roomType">LIVING</data>
+    <data key="center">POINT (2.134113788604736 1.7362504005432133)</data>
+    <data key="corners">POLYGON ((0.531613826751709 3.3549866676330566, 0.531613826751709 -1.153749704360962, 3.7366137504577637 -1.153749704360962, 3.7366137504577637 3.3387503623962402, 0.5541138052940369 3.3387503623962402, 0.5541138052940369 3.3549866676330566, 0.531613826751709 3.3549866676330566))</data>
+    <data key="windowExist">true</data>
+    <data key="enclosedRoom">false</data>
+    <data key="area">14.398828</data>
+  </node>
+  <node id="5f246b91-f636-418e-b4ab-234bb25e74d6">
+    <data key="name">Aufzug</data>
+    <data key="roomType">CORRIDOR</data>
+    <data key="center">POINT (-5.029353141307379 -4.054132612420979)</data>
+    <data key="corners">POLYGON ((-4.300944455834323 -4.850610164708869, -4.1846653860668805 -3.245959001918172, -5.835828176764554 -3.2924706298251483, -5.789316548857578 -4.897121792615846, -4.300944455834323 -4.850610164708869))</data>
+    <data key="windowExist">false</data>
+    <data key="enclosedRoom">false</data>
+    <data key="area">2.5173066</data>
+  </node>
+  <node id="0O2qvCotj5hwYFVhQ$OY48">
+    <data key="name">Ankommen</data>
+    <data key="roomType">CORRIDOR</data>
+    <data key="center">POINT (-0.530902624130249 -2.26527863740921)</data>
+    <data key="corners">POLYGON ((-2.645886182785034 -1.2527621984481812, -2.645886182785034 -3.2777950763702393, 0.48161381483078003 -3.2777950763702393, 0.48161381483078003 -1.2027621269226074, -1.08564293384552 -1.2027621269226074, -1.08564293384552 -1.2527621984481812, -2.645886182785034 -1.2527621984481812))</data>
+    <data key="windowExist">false</data>
+    <data key="enclosedRoom">false</data>
+    <data key="area">6.411653</data>
+  </node>
+  <edge id="2aE3puZVH818P0KdJs$wHm" source="0O2qvCotj5hwYFVhQ$OY48" target="0O2qvCotj5hwYFVhQ$OZzJ">
+    <data key="edgeType">DOOR</data>
+  </edge>
+  <edge id="2aE3puZVH818P0KdJs$wHo" source="0O2qvCotj5hwYFVhQ$OY48" target="0O2qvCotj5hwYFVhQ$OZvL">
+    <data key="edgeType">DOOR</data>
+  </edge>
+  <edge id="2867466d-3070-4a92-b3f0-6c2429770a71" source="5f246b91-f636-418e-b4ab-234bb25e74d6" target="0O2qvCotj5hwYFVhQ$OZzM">
+    <data key="edgeType">DOOR</data>
+  </edge>
+  <edge id="2aE3puZVH818P0KdJs$wHq" source="0O2qvCotj5hwYFVhQ$OY48" target="0O2qvCotj5hwYFVhQ$OZzM">
+    <data key="edgeType">ENTRANCE</data>
+  </edge>
+  <edge id="2aE3puZVH818P0KdJs$wH$" source="0O2qvCotj5hwYFVhQ$OY48" target="0O2qvCotj5hwYFVhQ$OY4r">
+    <data key="edgeType">PASSAGE</data>
+  </edge>
+  <edge id="e8a2cad8-dd24-4b91-886a-b074e68c560b" source="0O2qvCotj5hwYFVhQ$OY48" target="0O2qvCotj5hwYFVhQ$OY4s">
+    <data key="edgeType">PASSAGE</data>
+  </edge>
+  <edge id="78d03666-8fd7-4b5c-a4ee-d54be52fb1eb" source="0O2qvCotj5hwYFVhQ$OY4r" target="0O2qvCotj5hwYFVhQ$OY4s">
+    <data key="edgeType">PASSAGE</data>
+  </edge>
+  <edge id="2aE3puZVH818P0KdJs$wHz" source="0O2qvCotj5hwYFVhQ$OZzJ" target="0O2qvCotj5hwYFVhQ$OZvL">
+    <data key="edgeType">WALL</data>
+  </edge>
+  <edge id="0O2qvCotj5hwYFVhQ$OZyA" source="0O2qvCotj5hwYFVhQ$OY4s" target="0O2qvCotj5hwYFVhQ$OZvL">
+    <data key="edgeType">WALL</data>
+  </edge>
+  <edge id="2aE3puZVH818P0KdJs$wHc" source="0O2qvCotj5hwYFVhQ$OZzJ" target="0O2qvCotj5hwYFVhQ$OZzM">
+    <data key="edgeType">WALL</data>
+  </edge>
+  <edge id="2aE3puZVH818P0KdJs$wHc" source="0O2qvCotj5hwYFVhQ$OY4r" target="0O2qvCotj5hwYFVhQ$OZzM">
+    <data key="edgeType">WALL</data>
+  </edge>
+  </graph>
+</graphml>
