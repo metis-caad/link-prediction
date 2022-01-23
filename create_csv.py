@@ -17,6 +17,7 @@ namespace = '{http://graphml.graphdrawing.org/xmlns}'
 dirname = os.path.dirname(os.path.realpath(sys.argv[0])) + '/dataset/'
 classes = os.listdir(dirname)
 
+nodes = []
 rooms = [['id', 'class', 'type']]
 edges = [['source', 'target', 'weight']]
 
@@ -41,16 +42,21 @@ for cls in classes:
             target_type = get_room_type(target_id, graph)
             source = agraphml + source_id + source_type
             target = agraphml + target_id + target_type
-            source_code_id = str(int(hashlib.md5(source.encode('utf-8')).hexdigest(), 16))
-            target_code_id = str(int(hashlib.md5(target.encode('utf-8')).hexdigest(), 16))
-            # print(source_code, target_code)
-            source_entry = [source_code_id, cls, source_type]
-            target_entry = [target_code_id, cls, target_type]
+            source_code_id = int(hashlib.md5(source.encode('utf-8')).hexdigest(), 16)
+            target_code_id = int(hashlib.md5(target.encode('utf-8')).hexdigest(), 16)
+            if source_code_id not in nodes:
+                nodes.append(source_code_id)
+            if target_code_id not in nodes:
+                nodes.append(target_code_id)
+            source_index = str(nodes.index(source_code_id))
+            target_index = str(nodes.index(target_code_id))
+            source_entry = [source_index, cls, source_type]
+            target_entry = [target_index, cls, target_type]
             if source_entry not in rooms:
                 rooms.append(source_entry)
             if target_entry not in rooms:
                 rooms.append(target_entry)
-            edge_entry = [source_code_id, target_code_id, '1']
+            edge_entry = [source_index, target_index, '1']
             edges.append(edge_entry)
 
 assert count_r == (len(rooms) - 1) and count_e == (len(edges) - 1)  # -1: without header
