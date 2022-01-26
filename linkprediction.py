@@ -1,29 +1,12 @@
-"""
-Link Prediction using Graph Neural Networks
-===========================================
-
-In the :doc:`introduction <1_introduction>`, you have already learned
-the basic workflow of using GNNs for node classification,
-i.e. predicting the category of a node in a graph. This tutorial will
-teach you how to train a GNN for link prediction, i.e. predicting the
-existence of an edge between two arbitrary nodes in a graph.
-
-By the end of this tutorial you will be able to
-
--  Build a GNN-based link prediction model.
--  Train and evaluate the model on a small DGL-provided dataset.
-
-(Time estimate: 28 minutes)
-
-"""
-
-# import dgl
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
+import dgl.data
 import itertools
 import numpy as np
 import scipy.sparse as sp
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from dgl.nn.pytorch.conv import SAGEConv
+from sklearn.metrics import roc_auc_score
 
 ######################################################################
 # Overview of Link Prediction with GNN
@@ -40,7 +23,7 @@ import scipy.sparse as sp
 # problem as follows:
 #
 # -  Treat the edges in the graph as *positive examples*.
-# -  Sample a number of non-existent edges (i.e. node pairs with no edges
+# -  Sample a number of non-existent edges (i.e. node pairs with no edges
 #    between them) as *negative* examples.
 # -  Divide the positive examples and negative examples into a training
 #    set and a test set.
@@ -58,27 +41,13 @@ import scipy.sparse as sp
 # top-K predictions. In these cases you may want to consider other metrics
 # such as mean average precision, and use other negative sampling methods,
 # which are beyond the scope of this tutorial.
-#
-# Loading graph and features
-# --------------------------
-#
-# Following the :doc:`introduction <1_introduction>`, this tutorial
-# first loads the Cora dataset.
-#
-
-import dgl.data
 
 loaded_graph, labels_dict = dgl.load_graphs('room_conf_graph.dgl', [0])
 g = loaded_graph[0]
 
-######################################################################
-# Prepare training and testing sets
-# ---------------------------------
-#
 # This tutorial randomly picks 10% of the edges for positive examples in
 # the test set, and leave the rest for the training set. It then samples
 # the same number of edges for negative examples in both sets.
-#
 
 # Split edge set for training and testing
 u, v = g.edges()
@@ -130,7 +99,6 @@ test_neg_v = neg_v[neg_eids[:test_size]]  # TEST NEGATIVE TOs [16284 16232  6220
 train_neg_u = neg_u[neg_eids[test_size:]]  # TRAIN NEGATIVE FROMs [15299  9499  2560 ... 13913 15639 13647]
 train_neg_v = neg_v[neg_eids[test_size:]]  # TRAIN NEGATIVE TOs [13526 12575 10998 ...  2479  6414  1084]
 
-######################################################################
 # When training, you will need to remove the edges in the test set from
 # the original graph. You can do this via ``dgl.remove_edges``.
 #
@@ -144,21 +112,13 @@ train_neg_v = neg_v[neg_eids[test_size:]]  # TRAIN NEGATIVE TOs [13526 12575 109
 
 train_g = dgl.remove_edges(g, eids[:test_size])
 
-######################################################################
-# Define a GraphSAGE model
-# ------------------------
-#
+
 # This tutorial builds a model consisting of two
 # `GraphSAGE <https://arxiv.org/abs/1706.02216>`__ layers, each computes
 # new node representations by averaging neighbor information. DGL provides
 # ``dgl.nn.SAGEConv`` that conveniently creates a GraphSAGE layer.
-#
-
-from dgl.nn.pytorch.conv import SAGEConv
 
 
-# ----------- 2. create model -------------- #
-# build a two-layer GraphSAGE model
 class GraphSAGE(nn.Module):
     def __init__(self, in_feats, h_feats):
         super(GraphSAGE, self).__init__()
@@ -174,20 +134,12 @@ class GraphSAGE(nn.Module):
         return h_
 
 
-######################################################################
 # The model then predicts the probability of existence of an edge by
 # computing a score between the representations of both incident nodes
-# with a function (e.g. an MLP or a dot product), which you will see in
+# with a function (e.g. an MLP or a dot product), which you will see in
 # the next section.
-#
-# .. math::
-#
-#
-#    \hat{y}_{u\sim v} = f(h_u, h_v)
-#
 
 
-######################################################################
 # Positive graph, negative graph, and ``apply_edges``
 # ---------------------------------------------------
 #
@@ -208,7 +160,6 @@ class GraphSAGE(nn.Module):
 #
 # The following code constructs the positive graph and the negative graph
 # for the training set and the test set respectively.
-#
 
 train_pos_g = dgl.graph((train_pos_u, train_pos_v), num_nodes=g.number_of_nodes())
 # Graph(num_nodes=16636, num_edges=19185,
@@ -225,11 +176,12 @@ test_pos_g = dgl.graph((test_pos_u, test_pos_v), num_nodes=g.number_of_nodes())
 #       ndata_schemes={}
 #       edata_schemes={})
 test_neg_g = dgl.graph((test_neg_u, test_neg_v), num_nodes=g.number_of_nodes())
+
+
 # Graph(num_nodes=16636, num_edges=2131,
 #       ndata_schemes={}
 #       edata_schemes={})
 
-######################################################################
 # The benefit of treating the pairs of nodes as a graph is that you can
 # use the ``DGLGraph.apply_edges`` method, which conveniently computes new
 # edge features based on the incident nodes’ features and the original
@@ -239,26 +191,9 @@ test_neg_g = dgl.graph((test_neg_u, test_neg_v), num_nodes=g.number_of_nodes())
 # edge features based on the original node/edge features. For example,
 # ``dgl.function.u_dot_v`` computes a dot product of the incident nodes’
 # representations for each edge.
-#
-
-import dgl.function as fn
 
 
-class DotPredictor(nn.Module):
-    def forward(self, g_, h_):
-        with g_.local_scope():
-            g_.ndata['h'] = h_
-            # Compute a new edge feature named 'score' by a dot-product between the
-            # source node feature 'h' and destination node feature 'h'.
-            # print('u_dot_v', fn.u_dot_v('h', 'h', 'score'))
-            g_.apply_edges(fn.u_dot_v('h', 'h', 'score'))
-            # u_dot_v returns a 1-element vector for each edge so you need to squeeze it.
-            return g_.edata['score'][:, 0]
-
-
-######################################################################
-# You can also write your own function if it is complex.
-# For instance, the following module produces a scalar score on each edge
+# The following module produces a scalar score on each edge
 # by concatenating the incident nodes’ features and passing it to an MLP.
 #
 
@@ -295,41 +230,9 @@ class MLPPredictor(nn.Module):  # Multi-Layer-Perceptron
             return g_.edata['score']
 
 
-######################################################################
-# .. note::
-#
-#    The builtin functions are optimized for both speed and memory.
-#    We recommend using builtin functions whenever possible.
-#
-# .. note::
-#
-#    If you have read the :doc:`message passing
-#    tutorial <3_message_passing>`, you will notice that the
-#    argument ``apply_edges`` takes has exactly the same form as a message
-#    function in ``update_all``.
-#
-
-
-######################################################################
-# Training loop
-# -------------
-#
-# After you defined the node representation computation and the edge score
-# computation, you can go ahead and define the overall model, loss
-# function, and evaluation metric.
-#
-# The loss function is simply binary cross entropy loss.
-#
-# The evaluation metric in this tutorial is AUC.
-#
-
-# print(train_g.ndata['feat'].shape)
-# exit()
-
+# Model and predictor
 model = GraphSAGE(train_g.ndata['feat'].shape[1], 16)
-# You can replace DotPredictor with MLPPredictor.
-pred = MLPPredictor(16)
-# pred = DotPredictor()
+predictor = MLPPredictor(16)
 
 
 def compute_loss(pos_score_, neg_score_):
@@ -345,27 +248,14 @@ def compute_auc(pos_score_, neg_score_):
     return roc_auc_score(labels, scores)
 
 
-######################################################################
-# The training loop goes as follows:
-#
-# .. note::
-#
-#    This tutorial does not include evaluation on a validation
-#    set. In practice you should save and evaluate the best model based on
-#    performance on the validation set.
-#
+# Optimizer
+optimizer = torch.optim.Adam(itertools.chain(model.parameters(), predictor.parameters()), lr=0.01)
 
-# ----------- 3. set up loss and optimizer -------------- #
-# in this case, loss will in training loop
-optimizer = torch.optim.Adam(itertools.chain(model.parameters(), pred.parameters()), lr=0.01)
-
-# ----------- 4. training -------------------------------- #
-all_logits = []
 for e in range(3000):
     # forward
     h = model(train_g, train_g.ndata['feat'])
-    pos_score = pred(train_pos_g, h)
-    neg_score = pred(train_neg_g, h)
+    pos_score = predictor(train_pos_g, h)
+    neg_score = predictor(train_neg_g, h)
     loss = compute_loss(pos_score, neg_score)
 
     # backward
@@ -376,13 +266,7 @@ for e in range(3000):
     if e % 5 == 0:
         print('In epoch {}, loss: {}'.format(e, loss))
 
-# ----------- 5. check results ------------------------ #
-from sklearn.metrics import roc_auc_score
-
 with torch.no_grad():
-    pos_score = pred(test_pos_g, h)
-    neg_score = pred(test_neg_g, h)
+    pos_score = predictor(test_pos_g, h)
+    neg_score = predictor(test_neg_g, h)
     print('AUC', compute_auc(pos_score, neg_score))
-
-# Thumbnail credits: Link Prediction with Neo4j, Mark Needham
-# sphinx_gallery_thumbnail_path = '_static/blitz_4_link_predict.png'
