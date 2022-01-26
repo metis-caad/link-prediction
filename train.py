@@ -3,10 +3,10 @@ import itertools
 import numpy as np
 import scipy.sparse as sp
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
-from dgl.nn.pytorch.conv import SAGEConv
 from sklearn.metrics import roc_auc_score
+
+from network import GraphSAGE, MLPPredictor
 
 ######################################################################
 # Overview of Link Prediction with GNN
@@ -41,6 +41,7 @@ from sklearn.metrics import roc_auc_score
 # top-K predictions. In these cases you may want to consider other metrics
 # such as mean average precision, and use other negative sampling methods,
 # which are beyond the scope of this tutorial.
+
 
 loaded_graph, labels_dict = dgl.load_graphs('room_conf_graph.dgl', [0])
 g = loaded_graph[0]
@@ -113,31 +114,6 @@ train_neg_v = neg_v[neg_eids[test_size:]]  # TRAIN NEGATIVE TOs [13526 12575 109
 
 train_g = dgl.remove_edges(g, eids[:test_size])
 
-# This tutorial builds a model consisting of two
-# `GraphSAGE <https://arxiv.org/abs/1706.02216>`__ layers, each computes
-# new node representations by averaging neighbor information. DGL provides
-# ``dgl.nn.SAGEConv`` that conveniently creates a GraphSAGE layer.
-
-
-class GraphSAGE(nn.Module):
-    def __init__(self, in_feats, h_feats):
-        super(GraphSAGE, self).__init__()
-        self.conv1 = SAGEConv(in_feats=in_feats, out_feats=h_feats, aggregator_type='mean')
-        self.conv2 = SAGEConv(in_feats=h_feats, out_feats=h_feats, aggregator_type='mean')
-
-    def forward(self, g_, in_feat):
-        h_ = self.conv1(g_, in_feat)
-        h_ = F.relu(h_)
-        h_ = self.conv2(g_, h_)
-        return h_
-
-
-# The model then predicts the probability of existence of an edge by
-# computing a score between the representations of both incident nodes
-# with a function (e.g. an MLP or a dot product), which you will see in
-# the next section.
-
-
 # Positive graph, negative graph, and ``apply_edges``
 # ---------------------------------------------------
 #
@@ -188,44 +164,6 @@ test_neg_g = dgl.graph((test_neg_u, test_neg_v), num_nodes=g.number_of_nodes()).
 # ``dgl.function.u_dot_v`` computes a dot product of the incident nodes’
 # representations for each edge.
 
-
-# The following module produces a scalar score on each edge
-# by concatenating the incident nodes’ features and passing it to an MLP.
-#
-
-class MLPPredictor(nn.Module):  # Multi-Layer-Perceptron
-    def __init__(self, h_feats):
-        super().__init__()
-        self.W1 = nn.Linear(h_feats * 2, h_feats)
-        self.W2 = nn.Linear(h_feats, 1)
-
-    def apply_edges(self, edges):
-        """
-        Computes a scalar score for each edge of the given graph.
-
-        Parameters
-        ----------
-        edges :
-            Has three members ``src``, ``dst`` and ``data``, each of
-            which is a dictionary representing the features of the
-            source nodes, the destination nodes, and the edges
-            themselves.
-
-        Returns
-        -------
-        dict
-            A dictionary of new edge features.
-        """
-        h_ = torch.cat([edges.src['h'], edges.dst['h']], 1)
-        return {'score': self.W2(F.relu(self.W1(h_))).squeeze(1)}
-
-    def forward(self, g_, h_):
-        with g_.local_scope():
-            g_.ndata['h'] = h_
-            g_.apply_edges(self.apply_edges)
-            return g_.edata['score']
-
-
 # Model and predictor
 model = GraphSAGE(train_g.ndata['feat'].shape[1], 16).to('cuda')
 predictor = MLPPredictor(16).to('cuda')
@@ -246,12 +184,12 @@ def compute_auc(pos_score_, neg_score_):
 
 # Optimizer
 optimizer = torch.optim.Adam(itertools.chain(model.parameters(), predictor.parameters()), lr=0.01)
-trained = None
+outputs = None
 for e in range(3000):
     # forward
-    trained = model(train_g, train_g.ndata['feat'])
-    pos_score = predictor(train_pos_g, trained)
-    neg_score = predictor(train_neg_g, trained)
+    outputs = model(train_g, train_g.ndata['feat'])
+    pos_score = predictor(train_pos_g, outputs)
+    neg_score = predictor(train_neg_g, outputs)
     loss = compute_loss(pos_score, neg_score)
 
     # backward
@@ -262,10 +200,12 @@ for e in range(3000):
     if e % 5 == 0:
         print('In epoch {}, loss: {}'.format(e, loss))
 
-assert trained is not None
+assert outputs is not None
 
 with torch.no_grad():
-    pos_score = predictor(test_pos_g, trained)
-    neg_score = predictor(test_neg_g, trained)
+    pos_score = predictor(test_pos_g, outputs)
+    neg_score = predictor(test_neg_g, outputs)
     print('AUC', compute_auc(pos_score, neg_score))
 
+PATH = 'model.pth'
+torch.save(model.state_dict(), PATH)
