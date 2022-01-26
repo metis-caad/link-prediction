@@ -44,7 +44,6 @@ class RoomConfDataset(DGLDataset):
 
 
 dataset = RoomConfDataset()
-# exit()
 room_conf_graph = dataset[0]
 
 print(room_conf_graph)

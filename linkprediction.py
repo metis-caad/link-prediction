@@ -44,6 +44,7 @@ from sklearn.metrics import roc_auc_score
 
 loaded_graph, labels_dict = dgl.load_graphs('room_conf_graph.dgl', [0])
 g = loaded_graph[0]
+g = g.to('cuda')
 
 # This tutorial randomly picks 10% of the edges for positive examples in
 # the test set, and leave the rest for the training set. It then samples
@@ -69,7 +70,7 @@ train_pos_v = v[eids[test_size:]]  # TRAIN TOs tensor([14657, 13540,  2548,  ...
 
 # Find all negative edges and split them for training and testing
 # adj = sp.coo_matrix((np.ones(len(u)), (u.numpy(), v.numpy())))
-adj = sp.coo_matrix((np.ones(len(u)), (u.numpy(), v.numpy())),  # (21316, (all FROMs tensor, all TOs tensor))
+adj = sp.coo_matrix((np.ones(len(u)), (u.cpu().numpy(), v.cpu().numpy())),  # (21316, (all FROMs, all TOs))
                     shape=(g.number_of_nodes(), g.number_of_nodes()))
 # (0, 1)        1.0 = exists
 # (1, 2)        1.0
@@ -78,7 +79,7 @@ adj = sp.coo_matrix((np.ones(len(u)), (u.numpy(), v.numpy())),  # (21316, (all F
 # (16633, 16626)  1.0
 # (16634, 16626)  1.0
 # (16635, 16632)  1.0
-#
+
 # 1 here is g.number_of_nodes() X g.number_of_nodes() matrix of 1.0s
 adj_neg = 1 - adj.todense() - np.eye(g.number_of_nodes())
 # [[0. 0. 1. ... 1. 1. 1.]
@@ -112,7 +113,6 @@ train_neg_v = neg_v[neg_eids[test_size:]]  # TRAIN NEGATIVE TOs [13526 12575 109
 
 train_g = dgl.remove_edges(g, eids[:test_size])
 
-
 # This tutorial builds a model consisting of two
 # `GraphSAGE <https://arxiv.org/abs/1706.02216>`__ layers, each computes
 # new node representations by averaging neighbor information. DGL provides
@@ -122,8 +122,6 @@ train_g = dgl.remove_edges(g, eids[:test_size])
 class GraphSAGE(nn.Module):
     def __init__(self, in_feats, h_feats):
         super(GraphSAGE, self).__init__()
-        # print(in_feats, type(in_feats))
-        # print(h_feats, type(h_feats))
         self.conv1 = SAGEConv(in_feats=in_feats, out_feats=h_feats, aggregator_type='mean')
         self.conv2 = SAGEConv(in_feats=h_feats, out_feats=h_feats, aggregator_type='mean')
 
@@ -161,23 +159,21 @@ class GraphSAGE(nn.Module):
 # The following code constructs the positive graph and the negative graph
 # for the training set and the test set respectively.
 
-train_pos_g = dgl.graph((train_pos_u, train_pos_v), num_nodes=g.number_of_nodes())
+train_pos_g = dgl.graph((train_pos_u, train_pos_v), num_nodes=g.number_of_nodes()).to('cuda')
 # Graph(num_nodes=16636, num_edges=19185,
 #       ndata_schemes={}
 #       edata_schemes={})
 
-train_neg_g = dgl.graph((train_neg_u, train_neg_v), num_nodes=g.number_of_nodes())
+train_neg_g = dgl.graph((train_neg_u, train_neg_v), num_nodes=g.number_of_nodes()).to('cuda')
 # Graph(num_nodes=16636, num_edges=19185,
 #       ndata_schemes={}
 #       edata_schemes={})
 
-test_pos_g = dgl.graph((test_pos_u, test_pos_v), num_nodes=g.number_of_nodes())
+test_pos_g = dgl.graph((test_pos_u, test_pos_v), num_nodes=g.number_of_nodes()).to('cuda')
 # Graph(num_nodes=16636, num_edges=2131,
 #       ndata_schemes={}
 #       edata_schemes={})
-test_neg_g = dgl.graph((test_neg_u, test_neg_v), num_nodes=g.number_of_nodes())
-
-
+test_neg_g = dgl.graph((test_neg_u, test_neg_v), num_nodes=g.number_of_nodes()).to('cuda')
 # Graph(num_nodes=16636, num_edges=2131,
 #       ndata_schemes={}
 #       edata_schemes={})
@@ -231,31 +227,31 @@ class MLPPredictor(nn.Module):  # Multi-Layer-Perceptron
 
 
 # Model and predictor
-model = GraphSAGE(train_g.ndata['feat'].shape[1], 16)
-predictor = MLPPredictor(16)
+model = GraphSAGE(train_g.ndata['feat'].shape[1], 16).to('cuda')
+predictor = MLPPredictor(16).to('cuda')
 
 
 def compute_loss(pos_score_, neg_score_):
-    scores = torch.cat([pos_score_, neg_score_])
-    labels = torch.cat([torch.ones(pos_score_.shape[0]), torch.zeros(neg_score_.shape[0])])
+    scores = torch.cat([pos_score_, neg_score_]).to('cuda')
+    labels = torch.cat([torch.ones(pos_score_.shape[0]), torch.zeros(neg_score_.shape[0])]).to('cuda')
     return F.binary_cross_entropy_with_logits(scores, labels)
 
 
 def compute_auc(pos_score_, neg_score_):
-    scores = torch.cat([pos_score_, neg_score_]).numpy()
+    scores = torch.cat([pos_score_, neg_score_]).cpu().numpy()
     labels = torch.cat(
-        [torch.ones(pos_score_.shape[0]), torch.zeros(neg_score_.shape[0])]).numpy()
+        [torch.ones(pos_score_.shape[0]), torch.zeros(neg_score_.shape[0])]).cpu().numpy()
     return roc_auc_score(labels, scores)
 
 
 # Optimizer
 optimizer = torch.optim.Adam(itertools.chain(model.parameters(), predictor.parameters()), lr=0.01)
-
+trained = None
 for e in range(3000):
     # forward
-    h = model(train_g, train_g.ndata['feat'])
-    pos_score = predictor(train_pos_g, h)
-    neg_score = predictor(train_neg_g, h)
+    trained = model(train_g, train_g.ndata['feat'])
+    pos_score = predictor(train_pos_g, trained)
+    neg_score = predictor(train_neg_g, trained)
     loss = compute_loss(pos_score, neg_score)
 
     # backward
@@ -266,7 +262,10 @@ for e in range(3000):
     if e % 5 == 0:
         print('In epoch {}, loss: {}'.format(e, loss))
 
+assert trained is not None
+
 with torch.no_grad():
-    pos_score = predictor(test_pos_g, h)
-    neg_score = predictor(test_neg_g, h)
+    pos_score = predictor(test_pos_g, trained)
+    neg_score = predictor(test_neg_g, trained)
     print('AUC', compute_auc(pos_score, neg_score))
+
