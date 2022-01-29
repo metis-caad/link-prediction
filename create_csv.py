@@ -25,7 +25,7 @@ classes = os.listdir(dirname)
 
 nodes = []
 room_types = []
-rooms = [['id', 'class', 'type']]
+rooms = [['id', 'type', 'class']]
 edges = [['source', 'target', 'weight']]
 
 count_r = 0
@@ -63,8 +63,8 @@ for cls in classes:
                 nodes.append(target_code_id)
             source_index = str(nodes.index(source_code_id))
             target_index = str(nodes.index(target_code_id))
-            source_entry = [source_index, cls, source_type]
-            target_entry = [target_index, cls, target_type]
+            source_entry = [source_index, source_type, cls]
+            target_entry = [target_index, target_type, cls]
             if source_entry not in rooms:
                 rooms.append(source_entry)
             if target_entry not in rooms:
@@ -85,4 +85,5 @@ with open('edges.csv', 'a+') as edges_csv:
         edges_csv.write(','.join(edge) + '\n')
 
 with open('feat_count.txt', 'a+') as fc_txt:
-    fc_txt.write(str(len(room_types)))
+    fc_txt.write(str(len(classes)))
+    # fc_txt.write(str(len(room_types)))

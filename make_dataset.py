@@ -17,9 +17,10 @@ class RoomConfDataset(DGLDataset):
     def process(self):
         nodes_data = pd.read_csv('./rooms.csv')
         edges_data = pd.read_csv('./edges.csv')
-        node_features = torch.from_numpy(pd.get_dummies(nodes_data['type'], prefix='type').to_numpy())
+        node_features = torch.from_numpy(pd.get_dummies(nodes_data['class'], prefix='type').to_numpy())
         # node_features = torch.from_numpy(nodes_data['type'].astype('category').cat.codes.to_numpy())
-        node_labels = torch.from_numpy(nodes_data['class'].astype('category').cat.codes.to_numpy())
+        node_labels = torch.from_numpy(pd.get_dummies(nodes_data['type'], prefix='type').to_numpy())
+        # node_labels = torch.from_numpy(nodes_data['type'].astype('category').cat.codes.to_numpy())
         edge_features = torch.from_numpy(edges_data['weight'].to_numpy())
         edges_sources = torch.from_numpy(edges_data['source'].to_numpy())
         edges_targets = torch.from_numpy(edges_data['target'].to_numpy())
