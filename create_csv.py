@@ -20,6 +20,7 @@ def get_room_code_number(n_id, _graph):
 
 
 namespace = '{http://graphml.graphdrawing.org/xmlns}'
+# dirname = os.path.dirname(os.path.realpath(sys.argv[0])) + '/dataset_small/'
 dirname = os.path.dirname(os.path.realpath(sys.argv[0])) + '/dataset/'
 classes = os.listdir(dirname)
 
@@ -69,7 +70,11 @@ for cls in classes:
                 rooms.append(source_entry)
             if target_entry not in rooms:
                 rooms.append(target_entry)
-            edge_entry = [source_index, target_index, '1']
+            edge_type = ''
+            for data in edge.findall(namespace + 'data'):
+                if data.get('key') == 'edgeType':
+                    edge_type = data.text
+            edge_entry = [source_index, target_index, str(config.edge_type_weights[edge_type.upper()])]
             edges.append(edge_entry)
 
 assert count_r == (len(rooms) - 1) and count_e == (len(edges) - 1)  # -1: without header
@@ -84,6 +89,5 @@ with open('edges.csv', 'a+') as edges_csv:
     for edge in edges:
         edges_csv.write(','.join(edge) + '\n')
 
-with open('feat_count.txt', 'a+') as fc_txt:
+with open('feat_count.txt', 'w') as fc_txt:
     fc_txt.write(str(len(classes)))
-    # fc_txt.write(str(len(room_types)))

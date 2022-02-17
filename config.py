@@ -112,6 +112,17 @@ edge_code_numbers = {
     '45': EDGE
 }
 
+edge_type_weights = {
+    EDGE: 0,
+    DOOR: 1,
+    PASSAGE: 1,
+    ENTRANCE: 1,
+    STAIRS: 1,
+    WALL: 0.5,
+    SLAB: 0.5,
+    WINDOW: 0.5
+}
+
 all_zones = {
     ZONE_WET: [KITCHEN, TOILET, BATH],
     ZONE_DRY: [LIVING, SLEEPING, WORKING, CORRIDOR, CHILDREN],

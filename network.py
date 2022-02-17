@@ -18,14 +18,30 @@ from dgl.nn.pytorch.conv import SAGEConv
 class GraphSAGE(nn.Module):
     def __init__(self, in_feats, h_feats):
         super(GraphSAGE, self).__init__()
-        self.conv1 = SAGEConv(in_feats=in_feats, out_feats=h_feats, aggregator_type='mean')
-        self.conv2 = SAGEConv(in_feats=h_feats, out_feats=h_feats, aggregator_type='mean')
+        self.conv1 = SAGEConv(in_feats=in_feats, out_feats=h_feats, aggregator_type='mean', bias=True)
+        self.conv2 = SAGEConv(in_feats=h_feats, out_feats=h_feats, aggregator_type='mean', bias=True)
+        self.conv3 = SAGEConv(in_feats=h_feats, out_feats=h_feats, aggregator_type='mean', bias=True)
+        self.conv4 = SAGEConv(in_feats=h_feats, out_feats=h_feats, aggregator_type='mean', bias=True)
+
+        # AttributeError: 'GraphSAGE' object has no attribute 'bias'
+        # self.initialize_weights()
 
     def forward(self, g_, in_feat):
         h_ = self.conv1(g_, in_feat)
-        h_ = F.relu(h_)
+        h_ = torch.tanh(h_)
         h_ = self.conv2(g_, h_)
+        h_ = torch.tanh(h_)
+        h_ = F.dropout(h_, 0.5)
+        h_ = self.conv3(g_, h_)
+        h_ = torch.tanh(h_)
+        h_ = self.conv4(g_, h_)
         return h_
+
+    def initialize_weights(self):
+        for module in self.modules():
+            if isinstance(module, nn.Module):
+                nn.init.xavier_normal_(module.weight)
+                nn.init.constant_(module.bias, 0)
 
 
 # The following module produces a scalar score on each edge
@@ -35,8 +51,11 @@ class GraphSAGE(nn.Module):
 class MLPPredictor(nn.Module):  # Multi-Layer-Perceptron
     def __init__(self, h_feats):
         super().__init__()
-        self.W1 = nn.Linear(h_feats * 2, h_feats)
-        self.W2 = nn.Linear(h_feats, 1)
+        self.W1 = nn.Linear(h_feats * 2, h_feats * 4, bias=True)
+        self.W2 = nn.Linear(h_feats * 4, h_feats * 2, bias=True)
+        self.W3 = nn.Linear(h_feats * 2, 1)
+
+        self.initialize_weights()
 
     def apply_edges(self, edges):
         """
@@ -56,10 +75,16 @@ class MLPPredictor(nn.Module):  # Multi-Layer-Perceptron
             A dictionary of new edge features.
         """
         h_ = torch.cat([edges.src['h'], edges.dst['h']], 1)
-        return {'score': self.W2(F.relu(self.W1(h_))).squeeze(1)}
+        return {'score': self.W3(torch.relu(self.W2(torch.relu(self.W1(h_))))).squeeze(1)}
 
     def forward(self, g_, h_):
         with g_.local_scope():
             g_.ndata['h'] = h_
             g_.apply_edges(self.apply_edges)
             return g_.edata['score']
+
+    def initialize_weights(self):
+        for module in self.modules():
+            if isinstance(module, nn.Linear):
+                nn.init.xavier_normal_(module.weight)
+                nn.init.constant_(module.bias, 0)
