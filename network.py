@@ -18,10 +18,10 @@ from dgl.nn.pytorch.conv import SAGEConv
 class GraphSAGE(nn.Module):
     def __init__(self, in_feats, h_feats):
         super(GraphSAGE, self).__init__()
-        self.conv1 = SAGEConv(in_feats=in_feats, out_feats=h_feats, aggregator_type='mean', bias=True)
-        self.conv2 = SAGEConv(in_feats=h_feats, out_feats=h_feats, aggregator_type='mean', bias=True)
-        self.conv3 = SAGEConv(in_feats=h_feats, out_feats=h_feats, aggregator_type='mean', bias=True)
-        self.conv4 = SAGEConv(in_feats=h_feats, out_feats=h_feats, aggregator_type='mean', bias=True)
+        self.conv1 = SAGEConv(in_feats=in_feats, out_feats=h_feats, aggregator_type='mean')
+        self.conv2 = SAGEConv(in_feats=h_feats, out_feats=h_feats, aggregator_type='mean')
+        self.conv3 = SAGEConv(in_feats=h_feats, out_feats=h_feats, aggregator_type='mean')
+        self.conv4 = SAGEConv(in_feats=h_feats, out_feats=h_feats, aggregator_type='mean')
 
         # AttributeError: 'GraphSAGE' object has no attribute 'bias'
         # self.initialize_weights()
@@ -29,9 +29,9 @@ class GraphSAGE(nn.Module):
     def forward(self, g_, in_feat):
         h_ = self.conv1(g_, in_feat)
         h_ = torch.tanh(h_)
+        h_ = F.dropout(h_, 0.5)
         h_ = self.conv2(g_, h_)
         h_ = torch.tanh(h_)
-        h_ = F.dropout(h_, 0.5)
         h_ = self.conv3(g_, h_)
         h_ = torch.tanh(h_)
         h_ = self.conv4(g_, h_)
@@ -51,8 +51,8 @@ class GraphSAGE(nn.Module):
 class MLPPredictor(nn.Module):  # Multi-Layer-Perceptron
     def __init__(self, h_feats):
         super().__init__()
-        self.W1 = nn.Linear(h_feats * 2, h_feats * 4, bias=True)
-        self.W2 = nn.Linear(h_feats * 4, h_feats * 2, bias=True)
+        self.W1 = nn.Linear(h_feats * 2, h_feats * 4)
+        self.W2 = nn.Linear(h_feats * 4, h_feats * 2)
         self.W3 = nn.Linear(h_feats * 2, 1)
 
         self.initialize_weights()
