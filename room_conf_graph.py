@@ -3,7 +3,8 @@ import numpy as np
 import scipy.sparse as sp
 
 loaded_graph, labels_dict = dgl.load_graphs('room_conf_graph.dgl', [0])
-g = loaded_graph[0]
+gg = loaded_graph[0]
+g = dgl.add_reverse_edges(gg)
 g = g.to('cuda')
 
 # This tutorial randomly picks 10% of the edges for positive examples in
