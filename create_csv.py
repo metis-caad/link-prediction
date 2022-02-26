@@ -61,8 +61,15 @@ for cls in classes:
         if corridor_found:
             try:
                 with open(basedir + '/paths/' + agraphml + '-' + corridor_id + '.json', 'r') as json_file:
-                    jsn = json_file.readlines()[0]
-                lengths = json.loads(jsn)
+                    jsn1 = json_file.readlines()[0]
+                lengths = json.loads(jsn1)
+            except FileNotFoundError:
+                err_file += 1
+                continue
+            try:
+                with open(basedir + '/connectivity/' + cls + '/' + agraphml + '.json', 'r') as json_file:
+                    jsn2 = json_file.readlines()[0]
+                conns = json.loads(jsn2)
             except FileNotFoundError:
                 err_file += 1
                 continue
@@ -85,6 +92,18 @@ for cls in classes:
                 except KeyError:
                     err_node_t += 1
                     pass
+                source_conn = 1
+                target_conn = 1
+                try:
+                    source_conn = conns[source_id]
+                except KeyError:
+                    err_node_s += 1
+                    pass
+                try:
+                    target_conn = conns[target_id]
+                except KeyError:
+                    err_node_t += 1
+                    pass
                 source_type = get_room_type(source_id, graph)
                 target_type = get_room_type(target_id, graph)
                 if source_type not in room_types:
@@ -101,8 +120,10 @@ for cls in classes:
                     nodes.append(target_code_id)
                 source_index = str(nodes.index(source_code_id))
                 target_index = str(nodes.index(target_code_id))
-                source_feat = cls + '@' + str(source_length)
-                target_feat = cls + '@' + str(target_length)
+                source_feat = cls + '@' + str(source_length) + '@' + str(source_conn)
+                target_feat = cls + '@' + str(target_length) + '@' + str(target_conn)
+                # source_feat = str(source_length) + str(source_conn)
+                # target_feat = str(target_length) + str(target_conn)
                 if source_feat not in feats:
                     feats.append(source_feat)
                 if target_feat not in feats:
