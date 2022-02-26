@@ -7,10 +7,10 @@ import config
 
 
 def get_room_type(n_id, _graph):
-    for n in _graph.findall(namespace + 'node'):
-        if n_id == n.get('id'):
-            data = n.findall(namespace + 'data')
-            for d in data:
+    for node_el in _graph.findall(namespace + 'node'):
+        if n_id == node_el.get('id'):
+            data_el = node_el.findall(namespace + 'data')
+            for d in data_el:
                 if d.get('key') == 'roomType':
                     return d.text.upper()
 
