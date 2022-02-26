@@ -4,7 +4,8 @@ import os
 import sys
 import xml.etree.ElementTree as eT
 import config
-
+import random
+import shutil
 
 def get_room_type(n_id, _graph):
     for node_el in _graph.findall(namespace + 'node'):
@@ -22,7 +23,6 @@ def get_room_code_number(n_id, _graph):
 
 namespace = '{http://graphml.graphdrawing.org/xmlns}'
 basedir = os.path.dirname(os.path.realpath(sys.argv[0]))
-# dirname = os.path.dirname(os.path.realpath(sys.argv[0])) + '/dataset_small/'
 datadir = basedir + '/dataset_clean/'
 classes = os.listdir(datadir)
 
@@ -38,6 +38,9 @@ count_e = 0
 err_file = 0
 err_node_s = 0
 err_node_t = 0
+
+count_eval = 0
+count_train = 0
 
 for cls in classes:
     agraphmls = os.listdir(datadir + '/' + cls + '/')
@@ -59,6 +62,13 @@ for cls in classes:
             if corridor_found:
                 break
         if corridor_found:
+            # add the agraphml either to training or evaluation
+            if random.randrange(0, 10) == 0:
+                # add to evaluation
+                eval_filename = full_filename.replace('dataset_clean', 'evaluation')
+                shutil.copy(full_filename, eval_filename)
+                count_eval += 1
+                continue
             try:
                 with open(basedir + '/paths/' + agraphml + '-' + corridor_id + '.json', 'r') as json_file:
                     jsn1 = json_file.readlines()[0]
@@ -140,10 +150,11 @@ for cls in classes:
                         edge_type = data.text
                 edge_entry = [source_index, target_index, str(config.edge_type_weights[edge_type.upper()])]
                 edges.append(edge_entry)
+            count_train += 1
 
 # assert count_r == (len(rooms) - 1) and count_e == (len(edges) - 1)  # -1: without header
-print(str(len(rooms) - 1) + ' rooms,', str(len(edges) - 1) + ' edges')
-print(room_types)
+print('Train: ' + str(count_train) + ', Eval: ' + str(count_eval))
+print('Train: ' + str(len(rooms) - 1) + ' rooms,', str(len(edges) - 1) + ' edges')
 print('ERR lengths file:', err_file, ', ERR node s:', err_node_s, ', ERR node t:', err_node_t)
 
 with open('rooms.csv', 'a+') as rooms_csv:
