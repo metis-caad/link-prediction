@@ -1,11 +1,13 @@
 import hashlib
 import json
 import os
-import sys
-import xml.etree.ElementTree as eT
-import config
 import random
 import shutil
+import sys
+import xml.etree.ElementTree as eT
+
+import config
+
 
 def get_room_type(n_id, _graph):
     for node_el in _graph.findall(namespace + 'node'):
@@ -42,6 +44,33 @@ err_node_t = 0
 count_eval = 0
 count_train = 0
 
+eval_rooms = [['id', 'type', 'class']]
+eval_edges = [['source', 'target', 'weight']]
+
+
+def make_eval_entries(_room_types_eval, _cls):
+    max_conn = len(_room_types_eval)
+    max_depth = 3
+    evr = []
+    for i in range(0, len(_room_types_eval)):
+        rte = _room_types_eval[i]
+        init_depth = 1
+        if rte == config.CORRIDOR:
+            init_depth = 0
+        for j in range(init_depth, max_depth + 1):
+            for k in range(1, max_conn):
+                cr_eval = len(eval_rooms) - 1
+                eval_rooms.append([str(cr_eval), rte.upper(), cls + '@' + str(j) + '@' + str(k)])
+                evr.append([str(cr_eval), rte.upper() + '_' + str(i), cls + '@' + str(j) + '@' + str(k)])
+    for entry_o in evr:
+        t1 = entry_o[1]
+        for entry_i in evr:
+            t2 = entry_i[1]
+            if t1 != t2:
+                eval_edges.append([entry_o[0], entry_i[0], '0.5'])
+                eval_edges.append([entry_o[0], entry_i[0], '1'])
+
+
 for cls in classes:
     agraphmls = os.listdir(datadir + '/' + cls + '/')
     for agraphml in agraphmls:
@@ -63,11 +92,16 @@ for cls in classes:
                 break
         if corridor_found:
             # add the agraphml either to training or evaluation
-            if random.randrange(0, 10) == 0:
+            if agraphmls.index(agraphml) == 0:
                 # add to evaluation
                 eval_filename = full_filename.replace('dataset_clean', 'evaluation')
                 shutil.copy(full_filename, eval_filename)
                 count_eval += 1
+                room_types_eval = []
+                for node_eval in graph.findall(namespace + 'node'):
+                    room_type_eval = get_room_type(node_eval.get('id'), graph)
+                    room_types_eval.append(room_type_eval)
+                make_eval_entries(room_types_eval, cls)
                 continue
             try:
                 with open(basedir + '/paths/' + agraphml + '-' + corridor_id + '.json', 'r') as json_file:
@@ -167,3 +201,11 @@ with open('edges.csv', 'a+') as edges_csv:
 
 with open('feat_count.txt', 'w') as fc_txt:
     fc_txt.write(str(len(feats)))
+
+with open('queries/rooms.csv', 'a+') as rooms_csv_eval:
+    for er in eval_rooms:
+        rooms_csv_eval.write(','.join(er) + '\n')
+
+with open('queries/edges.csv', 'a+') as edges_csv_eval:
+    for ee in eval_edges:
+        edges_csv_eval.write(','.join(ee) + '\n')

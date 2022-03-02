@@ -63,7 +63,7 @@ def compute_auc(pos_score_, neg_score_):
 # Optimizer
 optimizer = torch.optim.RAdam(itertools.chain(model.parameters(), predictor.parameters()), lr=0.01)
 outputs = None
-for e in range(1000):
+for e in range(500):
     # forward
     outputs = model(room_conf_graph.train_g, room_conf_graph.train_g.ndata['feat'])
     pos_score = predictor(room_conf_graph.train_pos_g, outputs)
