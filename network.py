@@ -1,7 +1,9 @@
+import dgl.function as fn
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from dgl.nn.pytorch.conv import SAGEConv
+from sklearn.metrics import roc_auc_score
 
 
 # This tutorial builds a model consisting of two
@@ -55,7 +57,7 @@ class MLPPredictor(nn.Module):  # Multi-Layer-Perceptron
         self.W2 = nn.Linear(h_feats * 4, h_feats * 2)
         self.W3 = nn.Linear(h_feats * 2, 1)
 
-        self.initialize_weights()
+        # self.initialize_weights()
 
     def apply_edges(self, edges):
         """
@@ -88,3 +90,28 @@ class MLPPredictor(nn.Module):  # Multi-Layer-Perceptron
             if isinstance(module, nn.Linear):
                 nn.init.xavier_normal_(module.weight)
                 nn.init.constant_(module.bias, 0)
+
+
+class DotPredictor(nn.Module):
+    def forward(self, g_, h_):
+        with g_.local_scope():
+            g_.ndata['h'] = h_
+            # Compute a new edge feature named 'score' by a dot-product between the
+            # source node feature 'h' and destination node feature 'h'.
+            # print('u_dot_v', fn.u_dot_v('h', 'h', 'score'))
+            g_.apply_edges(fn.u_dot_v('h', 'h', 'score'))
+            # u_dot_v returns a 1-element vector for each edge so you need to squeeze it.
+            return g_.edata['score'][:, 0]
+
+
+def compute_loss(pos_score_, neg_score_):
+    scores = torch.cat([pos_score_, neg_score_]).to('cuda')
+    labels = torch.cat([torch.ones(pos_score_.shape[0]), torch.zeros(neg_score_.shape[0])]).to('cuda')
+    return F.binary_cross_entropy_with_logits(scores, labels)
+
+
+def compute_auc(pos_score_, neg_score_):
+    scores = torch.cat([pos_score_, neg_score_]).cpu().numpy()
+    labels = torch.cat(
+        [torch.ones(pos_score_.shape[0]), torch.zeros(neg_score_.shape[0])]).cpu().numpy()
+    return roc_auc_score(labels, scores)

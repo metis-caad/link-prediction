@@ -1,11 +1,9 @@
 import itertools
 
 import torch
-import torch.nn.functional as F
-from sklearn.metrics import roc_auc_score
 
-import room_conf_graph
-from network import GraphSAGE, MLPPredictor
+from room_conf_graph import RoomConfGraph
+from network import GraphSAGE, MLPPredictor, compute_loss, compute_auc, DotPredictor
 
 ######################################################################
 # Overview of Link Prediction with GNN
@@ -41,24 +39,13 @@ from network import GraphSAGE, MLPPredictor
 # such as mean average precision, and use other negative sampling methods,
 # which are beyond the scope of this tutorial.
 
+room_conf_graph = RoomConfGraph()
+room_conf_graph.init_graph()
 
 # Model and predictor
 model = GraphSAGE(room_conf_graph.train_g.ndata['feat'].shape[1], 16).to('cuda')
-predictor = MLPPredictor(16).to('cuda')
-
-
-def compute_loss(pos_score_, neg_score_):
-    scores = torch.cat([pos_score_, neg_score_]).to('cuda')
-    labels = torch.cat([torch.ones(pos_score_.shape[0]), torch.zeros(neg_score_.shape[0])]).to('cuda')
-    return F.binary_cross_entropy_with_logits(scores, labels)
-
-
-def compute_auc(pos_score_, neg_score_):
-    scores = torch.cat([pos_score_, neg_score_]).cpu().numpy()
-    labels = torch.cat(
-        [torch.ones(pos_score_.shape[0]), torch.zeros(neg_score_.shape[0])]).cpu().numpy()
-    return roc_auc_score(labels, scores)
-
+# predictor = MLPPredictor(16).to('cuda')
+predictor = DotPredictor().to('cuda')
 
 # Optimizer
 optimizer = torch.optim.RAdam(itertools.chain(model.parameters(), predictor.parameters()), lr=0.01)
@@ -75,7 +62,7 @@ for e in range(500):
     loss.backward()
     optimizer.step()
 
-    if e % 5 == 0:
+    if e % 10 == 0:
         print('In epoch {}, loss: {}'.format(e, loss))
 
 assert outputs is not None
@@ -83,7 +70,7 @@ assert outputs is not None
 with torch.no_grad():
     pos_score = predictor(room_conf_graph.test_pos_g, outputs)
     neg_score = predictor(room_conf_graph.test_neg_g, outputs)
-    print('AUC', compute_auc(pos_score, neg_score))
+    print('AUC Test', compute_auc(pos_score, neg_score))
 
 PATH = 'model.pth'
 torch.save(model.state_dict(), PATH)

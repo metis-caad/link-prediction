@@ -4,8 +4,8 @@ import torch
 from dgl.data import DGLDataset
 
 
-def get_feat_count():
-    with open('feat_count.txt', 'r') as fc_txt:
+def get_feat_count(feat_type=''):
+    with open('feat_count' + feat_type + '.txt', 'r') as fc_txt:
         feat_count = int(fc_txt.readlines()[0])
     assert feat_count > 0
     return feat_count
@@ -61,7 +61,8 @@ class QueryDataset(DGLDataset):
 
         self.graph = dgl.graph((edges_sources, edges_targets), num_nodes=nodes_data.shape[0])
         # self.graph.ndata['feat'] = node_features.float().resize(nodes_data_original.shape[0], get_feat_count())
-        self.graph.ndata['feat'] = node_features.float().resize(nodes_data.shape[0], get_feat_count())
+        print(node_features.size())
+        self.graph.ndata['feat'] = node_features.float().resize(nodes_data.shape[0], get_feat_count(feat_type='_eval'))
         # TODO is it reasonable to float (sage doesnt work otherwise)?
         self.graph.ndata['label'] = node_labels.long()
         self.graph.edata['weight'] = edge_features

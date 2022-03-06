@@ -29,7 +29,6 @@ datadir = basedir + '/dataset_clean/'
 classes = os.listdir(datadir)
 
 nodes = []
-room_types = []
 rooms = [['id', 'type', 'class']]
 edges = [['source', 'target', 'weight']]
 feats = []
@@ -44,35 +43,14 @@ err_node_t = 0
 count_eval = 0
 count_train = 0
 
+nodes_eval = []
 eval_rooms = [['id', 'type', 'class']]
 eval_edges = [['source', 'target', 'weight']]
-
-
-def make_eval_entries(_room_types_eval, _cls):
-    max_conn = len(_room_types_eval)
-    max_depth = 3
-    evr = []
-    for i in range(0, len(_room_types_eval)):
-        rte = _room_types_eval[i]
-        init_depth = 1
-        if rte == config.CORRIDOR:
-            init_depth = 0
-        for j in range(init_depth, max_depth + 1):
-            for k in range(1, max_conn):
-                cr_eval = len(eval_rooms) - 1
-                eval_rooms.append([str(cr_eval), rte.upper(), cls + '@' + str(j) + '@' + str(k)])
-                evr.append([str(cr_eval), rte.upper() + '_' + str(i), cls + '@' + str(j) + '@' + str(k)])
-    for entry_o in evr:
-        t1 = entry_o[1]
-        for entry_i in evr:
-            t2 = entry_i[1]
-            if t1 != t2:
-                eval_edges.append([entry_o[0], entry_i[0], '0.5'])
-                eval_edges.append([entry_o[0], entry_i[0], '1'])
-
+eval_feats = []
 
 for cls in classes:
     agraphmls = os.listdir(datadir + '/' + cls + '/')
+    random.shuffle(agraphmls)
     for agraphml in agraphmls:
         full_filename = datadir + '/' + cls + '/' + agraphml
         tree = eT.parse(full_filename)
@@ -92,17 +70,12 @@ for cls in classes:
                 break
         if corridor_found:
             # add the agraphml either to training or evaluation
-            if agraphmls.index(agraphml) == 0:
+            for_eval = False
+            if agraphmls.index(agraphml) in range(0, 6):
                 # add to evaluation
                 eval_filename = full_filename.replace('dataset_clean', 'evaluation')
                 shutil.copy(full_filename, eval_filename)
-                count_eval += 1
-                room_types_eval = []
-                for node_eval in graph.findall(namespace + 'node'):
-                    room_type_eval = get_room_type(node_eval.get('id'), graph)
-                    room_types_eval.append(room_type_eval)
-                make_eval_entries(room_types_eval, cls)
-                continue
+                for_eval = True
             try:
                 with open(basedir + '/paths/' + agraphml + '-' + corridor_id + '.json', 'r') as json_file:
                     jsn1 = json_file.readlines()[0]
@@ -150,46 +123,90 @@ for cls in classes:
                     pass
                 source_type = get_room_type(source_id, graph)
                 target_type = get_room_type(target_id, graph)
-                if source_type not in room_types:
-                    room_types.append(source_type)
-                if target_type not in room_types:
-                    room_types.append(target_type)
                 source = agraphml + source_id + source_type
                 target = agraphml + target_id + target_type
                 source_code_id = int(hashlib.md5(source.encode('utf-8')).hexdigest(), 16)
                 target_code_id = int(hashlib.md5(target.encode('utf-8')).hexdigest(), 16)
-                if source_code_id not in nodes:
-                    nodes.append(source_code_id)
-                if target_code_id not in nodes:
-                    nodes.append(target_code_id)
-                source_index = str(nodes.index(source_code_id))
-                target_index = str(nodes.index(target_code_id))
+                if not for_eval:
+                    if source_code_id not in nodes:
+                        nodes.append(source_code_id)
+                    if target_code_id not in nodes:
+                        nodes.append(target_code_id)
+                else:
+                    if source_code_id not in nodes_eval:
+                        nodes_eval.append(source_code_id)
+                    if target_code_id not in nodes_eval:
+                        nodes_eval.append(target_code_id)
+                if not for_eval:
+                    source_index = str(nodes.index(source_code_id))
+                    target_index = str(nodes.index(target_code_id))
+                else:
+                    source_index = str(nodes_eval.index(source_code_id))
+                    target_index = str(nodes_eval.index(target_code_id))
+                # source_feat = cls + '@' + str(0) + '@' + str(0)
+                # target_feat = cls + '@' + str(0) + '@' + str(0)
                 source_feat = cls + '@' + str(source_length) + '@' + str(source_conn)
                 target_feat = cls + '@' + str(target_length) + '@' + str(target_conn)
                 # source_feat = str(source_length) + str(source_conn)
                 # target_feat = str(target_length) + str(target_conn)
-                if source_feat not in feats:
-                    feats.append(source_feat)
-                if target_feat not in feats:
-                    feats.append(target_feat)
+                if not for_eval:
+                    if source_feat not in feats:
+                        feats.append(source_feat)
+                    if target_feat not in feats:
+                        feats.append(target_feat)
+                else:
+                    if source_feat not in eval_feats:
+                        eval_feats.append(source_feat)
+                    if target_feat not in eval_feats:
+                        eval_feats.append(target_feat)
                 source_entry = [source_index, source_type, source_feat]
                 target_entry = [target_index, target_type, target_feat]
-                if source_entry not in rooms:
-                    rooms.append(source_entry)
-                if target_entry not in rooms:
-                    rooms.append(target_entry)
+                if not for_eval:
+                    if source_entry not in rooms:
+                        rooms.append(source_entry)
+                    if target_entry not in rooms:
+                        rooms.append(target_entry)
+                else:
+                    if source_entry not in eval_rooms:
+                        eval_rooms.append(source_entry)
+                    if target_entry not in eval_rooms:
+                        eval_rooms.append(target_entry)
                 edge_type = ''
                 for data in edge.findall(namespace + 'data'):
                     if data.get('key') == 'edgeType':
                         edge_type = data.text
                 edge_entry = [source_index, target_index, str(config.edge_type_weights[edge_type.upper()])]
-                edges.append(edge_entry)
-            count_train += 1
+                if not for_eval:
+                    edges.append(edge_entry)
+                else:
+                    eval_edges.append(edge_entry)
+            if not for_eval:
+                count_train += 1
+            else:
+                count_eval += 1
 
-# assert count_r == (len(rooms) - 1) and count_e == (len(edges) - 1)  # -1: without header
-print('Train: ' + str(count_train) + ', Eval: ' + str(count_eval))
-print('Train: ' + str(len(rooms) - 1) + ' rooms,', str(len(edges) - 1) + ' edges')
-print('ERR lengths file:', err_file, ', ERR node s:', err_node_s, ', ERR node t:', err_node_t)
+feats_left = []
+for ft in feats:
+    if ft not in eval_feats:
+        feats_left.append(ft)
+
+print(len(feats), len(eval_feats), len(feats_left))
+
+last_eval_room_id = int(eval_rooms[len(eval_rooms) - 1][0])
+# last_eval_edge_id = int(eval_edges[len(eval_edges) - 1][0])
+
+for ftl in feats_left:
+    next1 = str(last_eval_room_id + 1)
+    next2 = str(last_eval_room_id + 2)
+    eval_rooms.append([next1, config.LIVING, ftl])
+    eval_rooms.append([next2, config.CORRIDOR, ftl])
+    eval_edges.append([next1, next2, '1'])
+    last_eval_room_id += 2
+    # last_eval_edge_id += 1
+    eval_feats.append(ftl)
+
+print(len(feats), len(eval_feats), len(feats_left))
+assert len(feats) == len(eval_feats)
 
 with open('rooms.csv', 'a+') as rooms_csv:
     for room in rooms:
@@ -209,3 +226,11 @@ with open('queries/rooms.csv', 'a+') as rooms_csv_eval:
 with open('queries/edges.csv', 'a+') as edges_csv_eval:
     for ee in eval_edges:
         edges_csv_eval.write(','.join(ee) + '\n')
+
+with open('feat_count_eval.txt', 'w') as fc_eval_txt:
+    fc_eval_txt.write(str(len(eval_feats)))
+
+print('Train: ' + str(count_train) + ', Eval: ' + str(count_eval))
+print('Train: ' + str(len(rooms) - 1) + ' rooms,', str(len(edges) - 1) + ' edges')
+print('Eval: ' + str(len(eval_rooms) - 1) + ' rooms,', str(len(eval_edges) - 1) + ' edges')
+print('ERR lengths file:', err_file, ', ERR node s:', err_node_s, ', ERR node t:', err_node_t)
