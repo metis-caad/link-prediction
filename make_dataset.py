@@ -1,13 +1,6 @@
 import dgl
-import pandas as pd
 
 from dataset_cls import RoomConfDataset
-
-rooms_csv = pd.read_csv('./rooms.csv')
-rooms_csv.head()
-
-edges_csv = pd.read_csv('./edges.csv')
-edges_csv.head()
 
 dataset = RoomConfDataset()
 room_conf_graph = dataset[0]

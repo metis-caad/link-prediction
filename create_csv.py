@@ -190,10 +190,7 @@ for ft in feats:
     if ft not in eval_feats:
         feats_left.append(ft)
 
-print(len(feats), len(eval_feats), len(feats_left))
-
 last_eval_room_id = int(eval_rooms[len(eval_rooms) - 1][0])
-# last_eval_edge_id = int(eval_edges[len(eval_edges) - 1][0])
 
 for ftl in feats_left:
     next1 = str(last_eval_room_id + 1)
@@ -202,10 +199,8 @@ for ftl in feats_left:
     eval_rooms.append([next2, config.CORRIDOR, ftl])
     eval_edges.append([next1, next2, '1'])
     last_eval_room_id += 2
-    # last_eval_edge_id += 1
     eval_feats.append(ftl)
 
-print(len(feats), len(eval_feats), len(feats_left))
 assert len(feats) == len(eval_feats)
 
 with open('rooms.csv', 'a+') as rooms_csv:

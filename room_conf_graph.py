@@ -14,10 +14,8 @@ class RoomConfGraph:
 
     def init_graph(self):
         loaded_graph, labels_dict = dgl.load_graphs('room_conf_graph' + self.feat_type + '.dgl', [0])
-        g = loaded_graph[0]
-        if self.feat_type == '':
-            print('Adding reverse edges ...')
-        g = dgl.add_reverse_edges(g)
+        gg = loaded_graph[0]
+        g = dgl.add_reverse_edges(gg)
         g = g.to('cuda')
 
         # This tutorial randomly picks 10% of the edges for positive examples in
