@@ -23,7 +23,6 @@ class GraphSAGE(nn.Module):
         self.conv1 = SAGEConv(in_feats=in_feats, out_feats=h_feats, aggregator_type='mean')
         self.conv2 = SAGEConv(in_feats=h_feats, out_feats=h_feats, aggregator_type='mean')
         self.conv3 = SAGEConv(in_feats=h_feats, out_feats=h_feats, aggregator_type='mean')
-        self.conv4 = SAGEConv(in_feats=h_feats, out_feats=h_feats, aggregator_type='mean')
 
         # AttributeError: 'GraphSAGE' object has no attribute 'bias'
         # self.initialize_weights()
@@ -35,8 +34,6 @@ class GraphSAGE(nn.Module):
         h_ = self.conv2(g_, h_)
         h_ = torch.tanh(h_)
         h_ = self.conv3(g_, h_)
-        h_ = torch.tanh(h_)
-        h_ = self.conv4(g_, h_)
         return h_
 
     def initialize_weights(self):

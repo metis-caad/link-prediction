@@ -5,6 +5,26 @@ import torch
 from room_conf_graph import RoomConfGraph
 from network import GraphSAGE, MLPPredictor, compute_loss, compute_auc, DotPredictor
 
+
+room_conf_graph = RoomConfGraph()
+room_conf_graph.init_graph()
+
+
+def get_auc(outputs_, step):
+    with torch.no_grad():
+        pos_score_ = predictor(room_conf_graph.test_pos_g, outputs_)
+        neg_score_ = predictor(room_conf_graph.test_neg_g, outputs_)
+        auc = compute_auc(pos_score_, neg_score_)
+        print('AUC Test', auc)
+        with open('auc.csv', 'a+') as auc_csv:
+            auc_csv.write('{},{}'.format(step, auc) + '\n')
+
+
+def get_loss(e_, loss_):
+    with open('train_loss.csv', 'a+') as trl:
+        trl.write('{},{}'.format(e_, loss_) + '\n')
+    print('In epoch {}, loss: {}'.format(e_, loss_))
+
 ######################################################################
 # Overview of Link Prediction with GNN
 # ------------------------------------
@@ -39,8 +59,6 @@ from network import GraphSAGE, MLPPredictor, compute_loss, compute_auc, DotPredi
 # such as mean average precision, and use other negative sampling methods,
 # which are beyond the scope of this tutorial.
 
-room_conf_graph = RoomConfGraph()
-room_conf_graph.init_graph()
 
 # Model and predictor
 model = GraphSAGE(room_conf_graph.train_g.ndata['feat'].shape[1], 16).to('cuda')
@@ -48,9 +66,11 @@ model = GraphSAGE(room_conf_graph.train_g.ndata['feat'].shape[1], 16).to('cuda')
 predictor = DotPredictor().to('cuda')
 
 # Optimizer
-optimizer = torch.optim.RAdam(itertools.chain(model.parameters(), predictor.parameters()), lr=0.01)
+optimizer = torch.optim.NAdam(itertools.chain(model.parameters(), predictor.parameters()), lr=0.01)
 outputs = None
-for e in range(500):
+loss = None
+train_range = 1000
+for e in range(train_range):
     # forward
     outputs = model(room_conf_graph.train_g, room_conf_graph.train_g.ndata['feat'])
     pos_score = predictor(room_conf_graph.train_pos_g, outputs)
@@ -63,14 +83,14 @@ for e in range(500):
     optimizer.step()
 
     if e % 10 == 0:
-        print('In epoch {}, loss: {}'.format(e, loss))
+        get_loss(e, loss)
+        get_auc(outputs, e)
 
 assert outputs is not None
+assert loss is not None
 
-with torch.no_grad():
-    pos_score = predictor(room_conf_graph.test_pos_g, outputs)
-    neg_score = predictor(room_conf_graph.test_neg_g, outputs)
-    print('AUC Test', compute_auc(pos_score, neg_score))
+get_loss(train_range, loss)
+get_auc(outputs, train_range)
 
 PATH = 'model.pth'
 torch.save(model.state_dict(), PATH)
