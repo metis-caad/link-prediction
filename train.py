@@ -69,7 +69,7 @@ predictor = DotPredictor().to('cuda')
 optimizer = torch.optim.NAdam(itertools.chain(model.parameters(), predictor.parameters()), lr=0.01)
 outputs = None
 loss = None
-train_range = 1000
+train_range = 500
 for e in range(train_range):
     # forward
     outputs = model(room_conf_graph.train_g, room_conf_graph.train_g.ndata['feat'])
