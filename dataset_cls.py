@@ -47,10 +47,6 @@ class QueryDataset(DGLDataset):
         super().__init__(name='room_conf_query')
 
     def process(self):
-        # nodes_data_original = pd.read_csv('./rooms.csv')
-        # node_features = torch.from_numpy(pd.get_dummies(nodes_data_original['class'], prefix='type').to_numpy())
-        # node_labels = torch.from_numpy(pd.get_dummies(nodes_data_original['type'], prefix='type').to_numpy())
-
         nodes_data = pd.read_csv(self.rooms_csv)
         node_features = torch.from_numpy(pd.get_dummies(nodes_data['class'], prefix='type').to_numpy())
         node_labels = torch.from_numpy(pd.get_dummies(nodes_data['type'], prefix='type').to_numpy())
@@ -60,8 +56,6 @@ class QueryDataset(DGLDataset):
         edges_targets = torch.from_numpy(edges_data['target'].to_numpy())
 
         self.graph = dgl.graph((edges_sources, edges_targets), num_nodes=nodes_data.shape[0])
-        # self.graph.ndata['feat'] = node_features.float().resize(nodes_data_original.shape[0], get_feat_count())
-        print(node_features.size())
         self.graph.ndata['feat'] = node_features.float().resize(nodes_data.shape[0], get_feat_count(feat_type='_eval'))
         # TODO is it reasonable to float (sage doesnt work otherwise)?
         self.graph.ndata['label'] = node_labels.long()
