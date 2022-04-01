@@ -8,10 +8,10 @@ Found isolated alternate_4_tes.graphml
 Found isolated alternate_15_4_tes.graphml
 Found isolated 24_haus.agraphml
 Found isolated alternate_15_24_haus.graphml
-Train: 2078, Eval: 89
-Train: 14309 rooms, 18530 edges
-Eval: 678 rooms, 907 edges
+Train: 2075, Eval: 92
+Train: 14261 rooms, 18463 edges
+Eval: 726 rooms, 974 edges
 ERR lengths file: 0 , ERR node s: 0 , ERR node t: 0
 
-AUC Test 0.9307667966853534
-AUC Eval 0.9870613104738473
+AUC Test 0.9303443274028704
+AUC Eval 0.982209416070397
