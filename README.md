@@ -1,6 +1,6 @@
 # link-prediction
 
-AI-based autocompletion of graph-based architectural spatial configurations using link prediction with graph neural networks.
+AI-based autocompletion of graph-based architectural spatial configurations using link prediction with graph neural networks (GNN).
 
 The main goal of the approach is to estimate the probability of relations between the rooms of the spatial configuration graph using the relevant semantic information.
 
