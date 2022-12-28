@@ -1,4 +1,3 @@
 .idea
 __pycache__/
 evaluation/*
-room_conf_graph_req.dgl
