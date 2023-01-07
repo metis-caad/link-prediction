@@ -27,3 +27,7 @@ Run `./train.sh` in console.
 You shoud get results similar to the evaluation in the paper (see linked paper).
 
 The evaluation was tested on Ubuntu 22.04 LTS with Python 3.10 and CUDA 11.6.
+
+# Run API (lpapi)
+
+Run `./api.sh` in console.
