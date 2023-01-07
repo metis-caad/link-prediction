@@ -1,5 +1,6 @@
 import json
 import os
+import subprocess
 import sys
 
 from django.http.response import HttpResponse
@@ -11,10 +12,10 @@ from django.views.decorators.csrf import csrf_exempt
 class UploadView(CreateView):
     model = Upload
     fields = ['file']
-    basedir = os.path.dirname(os.path.realpath(sys.argv[0]))
+    basedir_lp = os.path.dirname(os.path.realpath(sys.argv[0]))[:-12]
 
     def get_requests_dir(self):
-        return self.basedir[:-12] + 'requests/'
+        return self.basedir_lp + 'requests/'
 
     @staticmethod
     def remove_files(path, ext):
@@ -33,6 +34,9 @@ class UploadView(CreateView):
             self.remove_files(cls_dir_conn + '_open', '.json')
             self.remove_files(cls_dir_conn + '_closed', '.json')
         self.remove_files(requests_dir + 'paths/', '.json')
+        self.remove_files(requests_dir, '.csv')
+        self.remove_files(requests_dir, '.txt')
+        os.remove(self.basedir_lp + 'room_conf_graph_req.dgl')
 
     @csrf_exempt
     def dispatch(self, request, *args, **kwargs):
@@ -50,14 +54,17 @@ class UploadView(CreateView):
                     as agraphml_file:
                 agraphml_file.write(agraphml_str)
             connectivity_scores = completion_obj['connectivityScores']
-            with open(requests_dir + 'connectivity/' + spatial_class + '/' + completion_key + '.json', 'w') \
+            with open(requests_dir + 'connectivity/' + spatial_class + '/' + completion_key + '.graphml.json', 'w') \
                     as connectivity_file:
                 connectivity_file.write(json.dumps(connectivity_scores))
             shortest_paths = completion_obj['shortestPaths']
             for corridor_id in shortest_paths:
                 sp = shortest_paths[corridor_id]
-                with open(requests_dir + 'paths/' + completion_key + '.graphml_' + corridor_id + '.json', 'w') \
+                with open(requests_dir + 'paths/' + completion_key + '.graphml-' + corridor_id + '.json', 'w') \
                         as paths_file:
                     paths_file.write(json.dumps(sp))
-        response = HttpResponse(json.dumps([{'link_prediction_score': 0}]))
+        result = subprocess.run([self.basedir_lp + 'request.sh', self.basedir_lp], stdout=subprocess.PIPE)
+        output = result.stdout.decode('utf-8')
+        print('score', output)
+        response = HttpResponse(json.dumps([{'link_prediction_score': output.replace('\n', '')}]))
         return response

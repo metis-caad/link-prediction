@@ -5,8 +5,15 @@ import random
 import shutil
 import sys
 import xml.etree.ElementTree as eT
+from argparse import ArgumentParser
 
 import config
+
+parser = ArgumentParser()
+parser.add_argument('-t', '--type', dest='csv_type', required=True)
+args = parser.parse_args()
+
+csv_type = args.csv_type
 
 
 def get_room_type(n_id, _graph):
@@ -25,6 +32,8 @@ def get_room_code_number(n_id, _graph):
 
 namespace = '{http://graphml.graphdrawing.org/xmlns}'
 basedir = os.path.dirname(os.path.realpath(sys.argv[0]))
+if csv_type == 'request':
+    basedir = basedir + '/requests'
 datadir = basedir + '/dataset_clean/'
 classes = os.listdir(datadir)
 
@@ -62,7 +71,7 @@ def make_csv_entries(write=True):
             random.shuffle(agraphmls)
         for agraphml in agraphmls:
             if ('dataset_clean/' + cls + '/' + agraphml) not in with_isolated:
-                full_filename = datadir + '/' + cls + '/' + agraphml
+                full_filename = datadir + cls + '/' + agraphml
                 tree = eT.parse(full_filename)
                 root = tree.getroot()
                 graph = root[0]
@@ -226,28 +235,33 @@ def make_csv_entries(write=True):
         print('ERR lengths file:', err_file, ', ERR node s:', err_node_s, ', ERR node t:', err_node_t)
 
 
-make_csv_entries(write=False)
-make_csv_entries()
-assert len(eval_agraphmls) == len(feats)
+if csv_type == 'eval':
+    make_csv_entries(write=False)
 
-with open('rooms.csv', 'a+') as rooms_csv:
+make_csv_entries()
+
+if csv_type == 'eval':
+    assert len(eval_agraphmls) == len(feats)
+
+with open(basedir + '/rooms.csv', 'a+') as rooms_csv:
     for room in rooms:
         rooms_csv.write(','.join(room) + '\n')
 
-with open('edges.csv', 'a+') as edges_csv:
+with open(basedir + '/edges.csv', 'a+') as edges_csv:
     for edge_ in edges:
         edges_csv.write(','.join(edge_) + '\n')
 
-with open('feat_count.txt', 'w') as fc_txt:
+with open(basedir + '/feat_count.txt', 'w') as fc_txt:
     fc_txt.write(str(len(feats)))
 
-with open('queries/rooms.csv', 'a+') as rooms_csv_eval:
-    for er in eval_rooms:
-        rooms_csv_eval.write(','.join(er) + '\n')
+if csv_type == 'eval':
+    with open(basedir + '/queries/rooms.csv', 'a+') as rooms_csv_eval:
+        for er in eval_rooms:
+            rooms_csv_eval.write(','.join(er) + '\n')
 
-with open('queries/edges.csv', 'a+') as edges_csv_eval:
-    for ee in eval_edges:
-        edges_csv_eval.write(','.join(ee) + '\n')
+    with open(basedir + '/queries/edges.csv', 'a+') as edges_csv_eval:
+        for ee in eval_edges:
+            edges_csv_eval.write(','.join(ee) + '\n')
 
-with open('feat_count_eval.txt', 'w') as fc_eval_txt:
-    fc_eval_txt.write(str(len(eval_agraphmls)))
+    with open(basedir + '/feat_count_eval.txt', 'w') as fc_eval_txt:
+        fc_eval_txt.write(str(len(eval_agraphmls)))
