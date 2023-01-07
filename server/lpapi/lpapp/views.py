@@ -36,7 +36,10 @@ class UploadView(CreateView):
         self.remove_files(requests_dir + 'paths/', '.json')
         self.remove_files(requests_dir, '.csv')
         self.remove_files(requests_dir, '.txt')
-        os.remove(self.basedir_lp + 'room_conf_graph_req.dgl')
+        try:
+            os.remove(self.basedir_lp + 'room_conf_graph_req.dgl')
+        except OSError:
+            pass
 
     @csrf_exempt
     def dispatch(self, request, *args, **kwargs):
