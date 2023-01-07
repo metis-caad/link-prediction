@@ -1,9 +1,14 @@
+import os
+import sys
+
 import dgl.data
 import numpy as np
 import scipy.sparse as sp
 
 
 class RoomConfGraph:
+    basedir = os.path.dirname(os.path.realpath(sys.argv[0]))
+
     def __init__(self, feat_type=''):
         self.train_g = None
         self.train_neg_g = None
@@ -13,7 +18,7 @@ class RoomConfGraph:
         self.feat_type = feat_type
 
     def init_graph(self):
-        loaded_graph, labels_dict = dgl.load_graphs('room_conf_graph' + self.feat_type + '.dgl', [0])
+        loaded_graph, labels_dict = dgl.load_graphs(self.basedir + '/room_conf_graph' + self.feat_type + '.dgl', [0])
         gg = loaded_graph[0]
         g = dgl.add_reverse_edges(gg)
         g = g.to('cuda')
