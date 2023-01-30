@@ -51,21 +51,24 @@ class UploadView(CreateView):
         requests_dir = self.get_requests_dir()
         for completion_key in jsn:
             completion_obj = jsn[completion_key]
-            agraphml_str = completion_obj['completion']
             spatial_class = completion_obj['spatialClass']
-            with open(requests_dir + 'dataset_clean/' + spatial_class + '/' + completion_key + '.graphml', 'w') \
-                    as agraphml_file:
-                agraphml_file.write(agraphml_str)
-            connectivity_scores = completion_obj['connectivityScores']
-            with open(requests_dir + 'connectivity/' + spatial_class + '/' + completion_key + '.graphml.json', 'w') \
-                    as connectivity_file:
-                connectivity_file.write(json.dumps(connectivity_scores))
-            shortest_paths = completion_obj['shortestPaths']
-            for corridor_id in shortest_paths:
-                sp = shortest_paths[corridor_id]
-                with open(requests_dir + 'paths/' + completion_key + '.graphml-' + corridor_id + '.json', 'w') \
-                        as paths_file:
-                    paths_file.write(json.dumps(sp))
+            if int(str(spatial_class).split('_')[0]) <= 5:
+                agraphml_str = completion_obj['completion']
+                with open(requests_dir + 'dataset_clean/' + spatial_class + '/' + completion_key + '.graphml', 'w')\
+                        as agraphml_file:
+                    agraphml_file.write(agraphml_str)
+                connectivity_scores = completion_obj['connectivityScores']
+                with open(requests_dir + 'connectivity/' + spatial_class + '/' + completion_key + '.graphml.json', 'w')\
+                        as connectivity_file:
+                    connectivity_file.write(json.dumps(connectivity_scores))
+                shortest_paths = completion_obj['shortestPaths']
+                for corridor_id in shortest_paths:
+                    sp = shortest_paths[corridor_id]
+                    with open(requests_dir + 'paths/' + completion_key + '.graphml-' + corridor_id + '.json', 'w')\
+                            as paths_file:
+                        paths_file.write(json.dumps(sp))
+            else:
+                print('Error trying parse completion for class', spatial_class)
         result = subprocess.run([self.basedir_lp + 'request.sh', self.basedir_lp], stdout=subprocess.PIPE)
         output = result.stdout.decode('utf-8')
         print('score', output)

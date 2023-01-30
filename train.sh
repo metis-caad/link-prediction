@@ -7,4 +7,5 @@ touch 1.csv 1.dgl 1.pth 1.txt 1.png evaluation/{1..5}_open/1.txt evaluation/{1..
   && python3 make_dataset.py \
   && python3 train.py \
   && python3 load.py \
-  && python3 plot.py
+  && python3 plot.py \
+  && rm eval_clustering_autocompletion.list && python3 get_eval_list.py
