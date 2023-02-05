@@ -1,174 +1,199 @@
 Performing system checks...
 
 System check identified no issues (0 silenced).
-February 05, 2023 - 01:26:17
+February 05, 2023 - 15:32:15
 Django version 3.1.2, using settings 'lpapi.settings'
 Starting development server at http://127.0.0.1:8001/
 Quit the server with CONTROL-C.
-score 0.854296875
-
-score 0.8223932397766712
-
-score 0.8093199301497445
+score 0.8084571057544031
 
 Error trying parse completion for class 10_open
 Error trying parse completion for class 10_open
+Error trying parse completion for class 11_open
+Error trying parse completion for class 11_open
 Error trying parse completion for class 10_open
 Error trying parse completion for class 10_open
-Error trying parse completion for class 10_open
-Error trying parse completion for class 10_open
-Error trying parse completion for class 10_open
-Error trying parse completion for class 10_open
-Error trying parse completion for class 10_open
-score 0.8657195546752271
-
-score 0.8351420103152933
-
-score 0.8559977213541667
-
-score 0.8988827132946571
-
-score 0.9174022702338
-
-score 0.6609883622870636
-
-score 0.7925
-
-score 0.6575
-
-score 0.77
-
-score 0.8963517736220036
-
-score 0.8535901234567902
-
-score 0.9011477915134509
-
-score 0.628698224852071
-
-score 0.7952357247978552
-
-score 0.8971178182193833
-
-score 0.9404006109860049
-
-score 0.859413496785049
-
-score 0.9013212594060737
-
-score 0.8753810422412542
-
-score 0.9373006892586131
-
-score 0.9228774088829648
-
-score 0.8812487196002081
-
-score 0.9269517913373118
-
-score 0.9141403224549438
-
-score 0.9166831032215648
-
-score 0.8147765197272784
-
-score 0.8200000000000001
-
-score 0.44
-
-score 0.8763603169048231
-
-score 0.9284574026484808
-
-score 0.9331875150707352
-
-score 0.8518189513209973
-
-score 0.8646620928414167
-
-score 0.8950433115565104
-
-score 0.9058371317214954
-
 Error trying parse completion for class 10_open
 Error trying parse completion for class 11_open
 Error trying parse completion for class 10_open
+Error trying parse completion for class 10_open
+Error trying parse completion for class 10_open
+Error trying parse completion for class 10_open
+Error trying parse completion for class 10_open
+Error trying parse completion for class 10_open
 score 
-score 0.5710059171597633
+Error trying parse completion for class 10_open
+Error trying parse completion for class 10_open
+Error trying parse completion for class 10_open
+Error trying parse completion for class 10_open
+Error trying parse completion for class 10_open
+Error trying parse completion for class 10_open
+Error trying parse completion for class 10_open
+Error trying parse completion for class 10_open
+score 0.7694532468185704
 
-score 0.8610326051972472
+score 0.9596298292640288
 
-score 0.9016775860811158
+score 0.8820327359243025
 
-score 0.8758182900218211
+score 0.9583887745210165
 
-score 0.4444444444444444
+score 0.9283103370892402
 
-score 0.8856786242603549
+score 0.76875
 
-score 0.8958064396025234
+score 0.88150554495817
 
-score 0.9029465717295226
+score 0.9147077427221458
 
-score 0.9319007094631343
+score 0.919915802659975
 
-score 0.9248930676458157
+Error trying parse completion for class 10_open
+Error trying parse completion for class 10_open
+Error trying parse completion for class 10_open
+score 0.9320917823853516
 
-score 0.9237051361866138
+score 0.8582962038253489
 
-score 0.3520710059171598
+score 0.8090642695044837
 
-score 0.9457253286338402
+score 0.9254929469453429
 
-score 0.8826411337680787
+score 0.7744904667981591
 
-score 0.8653472222222222
+score 0.8513042357347474
 
-score 0.8538875669244497
+score 0.8076923076923077
 
-score 0.6382378472222223
+score 0.9148201088417091
 
-score 0.8148449233042404
+score 0.9386056041173743
 
-score 0.9189585425997074
+score 0.9170337536721033
 
-score 0.8775689561925365
+score 0.923597790424243
 
-score 0.9218724167036486
+score 0.9218740610540231
 
-score 0.9375982091075804
+score 0.9361243050614902
 
-score 0.8617046207032963
+score 0.8772735870143328
 
-score 0.9051016637001075
+score 0.8581026605751142
 
-score 0.9108635115025017
+score 0.8615916955017301
 
-score 0.9521836382383727
+score 0.8685121107266436
 
-score 0.9331648796098234
+score 0.9203204657386761
 
-score 0.9185874555829796
+score 0.9026320948926577
 
-score 0.9028798514598273
+score 0.9417662042426751
 
-score 0.9283180906556422
+score 0.92867202268431
 
-score 0.8688182076351982
+score 0.9272465487275395
 
-score 0.7829752066115703
+score 0.9145785836388883
 
-score 0.9148949032738095
+score 0.9480615509944343
 
-score 0.735207100591716
+Error trying parse completion for class 10_open
+score 0.9152325120471247
 
-score 0.9320756077121548
+score 0.8694728311417245
 
-score 0.907512045446919
+score 0.8999463517024373
 
-score 0.8722857903018479
+score 0.9142692397763819
 
-score 0.8922379791315572
+score 0.900616370210391
 
-score 0.9468964829231098
+score 0.8757916870864352
+
+score 0.6535802469135802
+
+score 0.8873577855443189
+
+score 0.857829702175044
+
+score 0.9016982440154128
+
+score 0.9205709949059184
+
+score 0.7237189021092483
+
+score 0.6085069444444444
+
+score 0.9274164809133524
+
+score 0.935702169717308
+
+score 0.9371689668414643
+
+score 0.9334263832080456
+
+score 0.7843113083497699
+
+score 0.8611442950204025
+
+score 0.9106462929930391
+
+score 0.7858974489795919
+
+score 0.9405826968983872
+
+score 0.8758424666162761
+
+score 0.821811322568243
+
+score 0.8318243549117247
+
+score 0.9174896715443763
+
+score 0.8584678969627066
+
+score 0.8464471879286695
+
+score 0.9415093328360847
+
+score 0.9185541224489795
+
+score 0.9222367089708271
+
+score 0.9505571516550725
+
+score 0.6911157024793388
+
+score 0.9342489165641791
+
+score 0.9510919496916289
+
+score 0.9188289496766094
+
+score 0.9172495321242167
+
+score 0.9241651833392666
+
+score 0.8035853747470312
+
+Error trying parse completion for class 10_open
+Error trying parse completion for class 10_open
+score 0.931046109235725
+
+Error trying parse completion for class 10_open
+score 0.9316434654615765
+
+score 0.8770311837946755
+
+score 0.9121358191145651
+
+score 0.9118915670298103
+
+score 0.9336547150852819
+
+score 0.8732277199074073
+
+score 0.955605366252336
 
