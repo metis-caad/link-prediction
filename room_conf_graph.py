@@ -4,6 +4,7 @@ import sys
 import dgl.data
 import numpy as np
 import scipy.sparse as sp
+import torch
 
 
 class RoomConfGraph:
@@ -16,12 +17,13 @@ class RoomConfGraph:
         self.test_neg_g = None
         self.test_pos_g = None
         self.feat_type = feat_type
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     def init_graph(self):
         loaded_graph, labels_dict = dgl.load_graphs(self.basedir + '/room_conf_graph' + self.feat_type + '.dgl', [0])
         gg = loaded_graph[0]
         g = dgl.add_reverse_edges(gg)
-        g = g.to('cuda')
+        g = g.to(self.device)
 
         # This tutorial randomly picks 10% of the edges for positive examples in
         # the test set, and leave the rest for the training set. It then samples
@@ -114,22 +116,22 @@ class RoomConfGraph:
         # The following code constructs the positive graph and the negative graph
         # for the training set and the test set respectively.
 
-        self.train_pos_g = dgl.graph((train_pos_u, train_pos_v), num_nodes=g.number_of_nodes()).to('cuda')
+        self.train_pos_g = dgl.graph((train_pos_u, train_pos_v), num_nodes=g.number_of_nodes()).to(self.device)
         # Graph(num_nodes=16636, num_edges=19185,
         #       ndata_schemes={}
         #       edata_schemes={})
 
-        self.train_neg_g = dgl.graph((train_neg_u, train_neg_v), num_nodes=g.number_of_nodes()).to('cuda')
+        self.train_neg_g = dgl.graph((train_neg_u, train_neg_v), num_nodes=g.number_of_nodes()).to(self.device)
         # Graph(num_nodes=16636, num_edges=19185,
         #       ndata_schemes={}
         #       edata_schemes={})
 
         if self.feat_type == '':
-            self.test_pos_g = dgl.graph((test_pos_u, test_pos_v), num_nodes=g.number_of_nodes()).to('cuda')
+            self.test_pos_g = dgl.graph((test_pos_u, test_pos_v), num_nodes=g.number_of_nodes()).to(self.device)
             # Graph(num_nodes=16636, num_edges=2131,
             #       ndata_schemes={}
             #       edata_schemes={})
-            self.test_neg_g = dgl.graph((test_neg_u, test_neg_v), num_nodes=g.number_of_nodes()).to('cuda')
+            self.test_neg_g = dgl.graph((test_neg_u, test_neg_v), num_nodes=g.number_of_nodes()).to(self.device)
             # Graph(num_nodes=16636, num_edges=2131,
             #       ndata_schemes={}
             #       edata_schemes={})
