@@ -9,6 +9,7 @@ from network import GraphSAGE, MLPPredictor, compute_loss, compute_auc, DotPredi
 room_conf_graph = RoomConfGraph()
 room_conf_graph.init_graph()
 
+device = torch.device('cpu')  # torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 def get_auc(outputs_, step):
     with torch.no_grad():
@@ -61,9 +62,9 @@ def get_loss(e_, loss_):
 
 
 # Model and predictor
-model = GraphSAGE(room_conf_graph.train_g.ndata['feat'].shape[1], 16).to('cuda')
-# predictor = MLPPredictor(16).to('cuda')
-predictor = DotPredictor().to('cuda')
+model = GraphSAGE(room_conf_graph.train_g.ndata['feat'].shape[1], 16).to(device)
+# predictor = MLPPredictor(16).to(device)
+predictor = DotPredictor().to(device)
 
 # Optimizer
 optimizer = torch.optim.NAdam(itertools.chain(model.parameters(), predictor.parameters()), lr=0.01)

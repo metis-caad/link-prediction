@@ -14,9 +14,7 @@ Following packages are required to run link prediction:
 
 `python3-pip`
 
-[Deep Graph Library (DGL)](https://www.dgl.ai/pages/start.html)
-
-[CUDA](https://developer.nvidia.com/cuda-zone)
+[Deep Graph Library (DGL)](https://www.dgl.ai/pages/start.html) (Non-CUDA version should suffice)
 
 [Matplotlib](https://matplotlib.org/stable/users/getting_started/)
 
@@ -24,7 +22,7 @@ Following packages are required to run link prediction:
 
 Run `./train.sh` in console.
 
-You shoud get results similar to the evaluation in the paper (see linked paper).
+You should get results similar to the evaluation in the paper (see linked paper).
 
 The evaluation was tested on Ubuntu 22.04 LTS with Python 3.10 and CUDA 11.6.
 

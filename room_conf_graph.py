@@ -17,7 +17,7 @@ class RoomConfGraph:
         self.test_neg_g = None
         self.test_pos_g = None
         self.feat_type = feat_type
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.device = torch.device('cpu')  # torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     def init_graph(self):
         loaded_graph, labels_dict = dgl.load_graphs(self.basedir + '/room_conf_graph' + self.feat_type + '.dgl', [0])

@@ -17,6 +17,9 @@ from sklearn.metrics import roc_auc_score
 # the next section.
 
 
+device = torch.device('cpu')  # torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+
 class GraphSAGE(nn.Module):
     def __init__(self, in_feats, h_feats):
         super(GraphSAGE, self).__init__()
@@ -104,8 +107,8 @@ class DotPredictor(nn.Module):
 
 
 def compute_loss(pos_score_, neg_score_):
-    scores = torch.cat([pos_score_, neg_score_]).to('cuda')
-    labels = torch.cat([torch.ones(pos_score_.shape[0]), torch.zeros(neg_score_.shape[0])]).to('cuda')
+    scores = torch.cat([pos_score_, neg_score_]).to(device)
+    labels = torch.cat([torch.ones(pos_score_.shape[0]), torch.zeros(neg_score_.shape[0])]).to(device)
     return F.binary_cross_entropy_with_logits(scores, labels)
 
 
