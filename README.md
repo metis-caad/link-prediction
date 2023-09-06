@@ -10,9 +10,9 @@ The approach is published in the context of the paper ["Autocompletion of Design
 
 Following packages are required to run link prediction:
 
-`python3`
+`python3` & `python3-pip`
 
-`python3-pip`
+`django` & `djangorestframework`
 
 [Deep Graph Library (DGL)](https://www.dgl.ai/pages/start.html) (Non-CUDA version should suffice)
 
